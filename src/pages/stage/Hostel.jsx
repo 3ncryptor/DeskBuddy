@@ -1,35 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import HostelScanPNG from '../../assets/HostelScan.png';
 import scanQR from '../../assets/scanQR.svg';
 import HistoryPNG from '../../assets/History.png';
 import "../../styles/StagePage.css";
 
 const HostelPage = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-
-  // Capitalize each word in the name
-  const capitalizeName = (name) =>
-    name.replace(/\b\w/g, (c) => c.toUpperCase());
-
-  // Get display name for Google, fallback to email/password name or email
-  const getUserName = () => {
-    if (!user) return '';
-    if (user.displayName) return capitalizeName(user.displayName);
-    if (user.email) return capitalizeName(user.email.split('@')[0]);
-    return 'User';
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
 
   return (
     <div className="stage-page">
@@ -47,30 +23,11 @@ const HostelPage = () => {
                 Back to Dashboard
               </button>
               <div className="page-info">
-                <h1 className="page-title">Hostel Check-in</h1>
+                <h1 className="page-title">Hostel Verification</h1>
                 <p className="page-description">
-                  Verify hostel assignments and process room allocations
+                  Verify hostel assignments and manage room allocations
                 </p>
               </div>
-            </div>
-            <div className="header-actions">
-              <div className="user-info">
-                <div className="user-avatar">
-                  {getUserName().charAt(0).toUpperCase()}
-                </div>
-                <div className="user-details">
-                  <span className="user-name">{getUserName()}</span>
-                  <span className="user-role">Administrator</span>
-                </div>
-              </div>
-              <button className="btn btn-secondary logout-btn" onClick={handleLogout}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16,17 21,12 16,7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                Sign Out
-              </button>
             </div>
           </div>
         </header>
@@ -84,7 +41,7 @@ const HostelPage = () => {
               <div className="card-content">
                 <h3 className="card-title">Scan QR Code</h3>
                 <p className="card-description">
-                  Scan student QR codes to process hostel check-ins
+                  Scan student QR codes to verify hostel assignments
                 </p>
               </div>
               <div className="card-action">
@@ -102,7 +59,7 @@ const HostelPage = () => {
               <div className="card-content">
                 <h3 className="card-title">View History</h3>
                 <p className="card-description">
-                  Access hostel check-in records
+                  Access hostel verification records and history
                 </p>
                 <span className="coming-soon">Coming Soon</span>
               </div>
