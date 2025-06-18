@@ -29,10 +29,7 @@ A modern React application for managing student check-in processes with glassmor
    ```
 
 2. **Environment setup**
-   ```bash
-   cp .env.example .env
-   ```
-   Then edit `.env` and add your Firebase configuration:
+   Create `.env` file:
    ```env
    VITE_FIREBASE_API_KEY=your_api_key
    VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
