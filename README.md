@@ -5,7 +5,6 @@ A modern React application for managing student check-in processes with glassmor
 ## Features
 
 - 🔐 **Authentication** - Google OAuth and email/password login
-- 📱 **Dashboard** - Netflix-style cards with hover effects
 - 📷 **QR Scanning** - Real-time camera-based QR code scanning
 - 📊 **Student Management** - Multi-stage check-in process
 - 📧 **Email System** - Automated QR code delivery to students
@@ -30,7 +29,10 @@ A modern React application for managing student check-in processes with glassmor
    ```
 
 2. **Environment setup**
-   Create `.env` file:
+   ```bash
+   cp .env.example .env
+   ```
+   Then edit `.env` and add your Firebase configuration:
    ```env
    VITE_FIREBASE_API_KEY=your_api_key
    VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
