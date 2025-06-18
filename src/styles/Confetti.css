@@ -1,0 +1,53 @@
+.confetti-container {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+.confetti {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 18px;
+  border-radius: 3px;
+  opacity: 0.85;
+  animation: confetti-burst 1.1s cubic-bezier(.4,0,.2,1) forwards;
+}
+.confetti-0 { background: #10b981; }
+.confetti-1 { background: #3b82f6; }
+.confetti-2 { background: #f59e42; }
+.confetti-3 { background: #ef4444; }
+.confetti-4 { background: #a21caf; }
+.confetti-5 { background: #fbbf24; }
+
+.confetti-0 { transform: rotate(12deg); }
+.confetti-1 { transform: rotate(-8deg); }
+.confetti-2 { transform: rotate(24deg); }
+.confetti-3 { transform: rotate(-18deg); }
+.confetti-4 { transform: rotate(6deg); }
+.confetti-5 { transform: rotate(-14deg); }
+
+@keyframes confetti-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(var(--angle, 0deg));
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x, 0px), var(--y, 0px)) scale(0.7) rotate(var(--angle, 0deg));
+  }
+}
+
+.confetti-0 { --x: -120px; --y: -180px; --angle: 12deg; }
+.confetti-1 { --x: 90px; --y: -160px; --angle: -8deg; }
+.confetti-2 { --x: -80px; --y: 120px; --angle: 24deg; }
+.confetti-3 { --x: 110px; --y: 140px; --angle: -18deg; }
+.confetti-4 { --x: -100px; --y: 80px; --angle: 6deg; }
+.confetti-5 { --x: 120px; --y: -100px; --angle: -14deg; } 

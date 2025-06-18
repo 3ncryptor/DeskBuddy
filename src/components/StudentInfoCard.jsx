@@ -1,152 +1,157 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "../styles/StudentInfoCard.css";
+import avatar from "../assets/avitar.webp"; // fallback to .svg if .png not found
 
-const fields = [
-  { label: "👤 Name", key: "name" },
-  { label: "🆔 Student ID", key: "studentId" },
-  { label: "🛏️ Room Number", key: "roomNumber" },
-  { label: "🧾 Group Assigned", key: "group" },
-  { label: "📱 Phone Number", key: "phone" },
-  { label: "📅 Date of Arrival", key: "arrivalDate" },
-  { label: "✅ Arrival Status", key: "arrival", bool: true },
-  { label: "🛌 Hostel Verified", key: "hostelVerified", bool: true },
-  { label: "📄 Documents Verified", key: "documentsVerified", bool: true },
-  { label: "🎒 Kit Received", key: "kitReceived", bool: true },
-];
+const stageLabels = {
+  arrival: { label: "Arrival", statusKey: "arrival", verifiedByKey: "arrivalVerifiedBy", icon: "🏠" },
+  hostel: { label: "Hostel", statusKey: "hostelVerified", verifiedByKey: "hostelVerifiedBy", icon: "🏢" },
+  documents: { label: "Documents", statusKey: "documentsVerified", verifiedByKey: "documentsVerifiedBy", icon: "📄" },
+  kit: { label: "Kit", statusKey: "kitReceived", verifiedByKey: "kitReceivedBy", icon: "📦" }
+};
 
-const logFields = [
-  {
-    section: "Arrival Log",
-    volunteer: { label: "🙋‍♂️ Checked By", key: "logs.arrival.volunteer" },
-    time: { label: "🕓 Time", key: "logs.arrival.timestamp" },
-  },
-  {
-    section: "Hostel Log",
-    volunteer: { label: "🧑‍💻 Checked By", key: "logs.hostel.volunteer" },
-    time: { label: "🕓 Time", key: "logs.hostel.timestamp" },
-  },
-];
+const StudentInfoCard = ({ student, currentStage }) => {
+  const stage = stageLabels[currentStage];
+  let status = null;
+  let completionPercentage = 0;
+  let completedStages = 0;
+  let totalStages = 4;
 
-function getValue(obj, path) {
-  return path.split('.').reduce((o, k) => (o ? o[k] : undefined), obj);
-}
+  if (student) {
+    // Calculate completion percentage
+    const stages = Object.values(stageLabels);
+    completedStages = stages.filter(s => student[s.statusKey]).length;
+    completionPercentage = (completedStages / totalStages) * 100;
+  }
 
-const StudentInfoCard = ({ student }) => {
-  const [typedLines, setTypedLines] = useState([]); // [{idx, value: string}]
-  const [typingIdx, setTypingIdx] = useState(0); // which field is being typed
-  const [typingText, setTypingText] = useState("");
-  const [showLogs, setShowLogs] = useState(false);
-  const [logIdx, setLogIdx] = useState(0);
-  const [logTyping, setLogTyping] = useState([""]);
+  if (stage && student) {
+    const completed = !!student[stage.statusKey];
+    const verifiedBy = student[stage.verifiedByKey];
+    status = {
+      label: stage.label,
+      completed,
+      verifiedBy,
+      icon: stage.icon
+    };
+  }
 
-  useEffect(() => {
-    setTypedLines([]);
-    setTypingIdx(0);
-    setTypingText("");
-    setShowLogs(false);
-    setLogIdx(0);
-    setLogTyping([""]);
-    if (!student) return;
-    let i = 0;
-    function typeField() {
-      if (i < fields.length) {
-        const f = fields[i];
-        let value = f.bool ? (getValue(student, f.key) ? "Yes" : "No") : String(getValue(student, f.key));
-        let charIdx = 0;
-        function typeChar() {
-          setTypingIdx(i);
-          setTypingText(value.slice(0, charIdx + 1));
-          if (charIdx < value.length - 1) {
-            charIdx++;
-            setTimeout(typeChar, 32 + Math.random() * 30);
-          } else {
-            setTypedLines((prev) => [...prev, { idx: i, value }]);
-            setTypingText("");
-            i++;
-            setTimeout(typeField, 120);
-          }
-        }
-        typeChar();
-      } else {
-        setShowLogs(true);
-        setTimeout(() => typeLog(0), 300);
-      }
-    }
-    function typeLog(logI) {
-      if (logI < logFields.length) {
-        setLogIdx(logI);
-        setLogTyping(["", ""]);
-        const log = logFields[logI];
-        const volunteer = String(getValue(student, log.volunteer.key));
-        const time = String(getValue(student, log.time.key));
-        let vIdx = 0, tIdx = 0;
-        function typeVolunteer() {
-          setLogTyping(([, t]) => [volunteer.slice(0, vIdx + 1), t]);
-          if (vIdx < volunteer.length - 1) {
-            vIdx++;
-            setTimeout(typeVolunteer, 32 + Math.random() * 30);
-          } else {
-            setTimeout(typeTime, 120);
-          }
-        }
-        function typeTime() {
-          setLogTyping(([v]) => [v, time.slice(0, tIdx + 1)]);
-          if (tIdx < time.length - 1) {
-            tIdx++;
-            setTimeout(typeTime, 32 + Math.random() * 30);
-          } else {
-            setTimeout(() => typeLog(logI + 1), 200);
-          }
-        }
-        typeVolunteer();
-      }
-    }
-    typeField();
-    // eslint-disable-next-line
-  }, [student]);
+  // Determine card color based on completion
+  const getCardColorClass = () => {
+    if (!student) return "neutral";
+    if (completionPercentage === 100) return "completed";
+    if (completionPercentage >= 50) return "in-progress";
+    return "pending";
+  };
 
-  return (
-    <div className="student-card glassy-student-card">
-      <div className="student-card-header">
-        <span className="student-icon">👤</span>
-        <span className="student-name">{student.name}</span>
-      </div>
-      <div className="student-id">🆔 {student.studentId}</div>
-      <div className="student-fields">
-        {fields.map((f, idx) => {
-          const typed = typedLines.find((l) => l.idx === idx);
-          if (typed) {
-            return (
-              <div className="student-row" key={f.key}>
-                <span className="student-label">{f.label}:</span>
-                <span className={`student-value${f.bool ? (getValue(student, f.key) ? ' yes' : ' no') : ''}`}>{typed.value}</span>
-              </div>
-            );
-          } else if (typingIdx === idx) {
-            return (
-              <div className="student-row" key={f.key}>
-                <span className="student-label">{f.label}:</span>
-                <span className={`student-value${f.bool ? (getValue(student, f.key) ? ' yes' : ' no') : ''}`}>{typingText}<span className="typing-cursor">|</span></span>
-              </div>
-            );
-          } else {
-            return null;
-          }
-        })}
-      </div>
-      {showLogs && logFields.map((log, idx) => (
-        <div className="student-log-section" key={log.section}>
-          <div className="log-title">──────── {log.section} ────────</div>
-          <div className="student-row">
-            <span className="student-label">{log.volunteer.label}:</span>
-            <span className="student-value">{logIdx === idx ? logTyping[0] : logIdx > idx ? getValue(student, log.volunteer.key) : ""}{logIdx === idx && <span className="typing-cursor">|</span>}</span>
+  if (!student) {
+    return (
+      <div className={`student-card professional-card fade-in wide big ${getCardColorClass()}`}>
+        <div className="student-card-header big">
+          <div className="avatar-container">
+            <img src={avatar} alt="Student Avatar" className="student-avatar big" />
+            <div className="avatar-status neutral">⏳</div>
           </div>
-          <div className="student-row">
-            <span className="student-label">{log.time.label}:</span>
-            <span className="student-value">{logIdx === idx ? logTyping[1] : logIdx > idx ? getValue(student, log.time.key) : ""}{logIdx === idx && logTyping[1] && <span className="typing-cursor">|</span>}</span>
+          <div className="student-header-info">
+            <span className="student-name big">No Student Data</span>
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: '0%' }}></div>
+            </div>
           </div>
         </div>
-      ))}
+        <div className="student-fields empty">
+          <div className="student-row">
+            <span className="student-label">Status:</span>
+            <span className="student-value">Please scan a QR code</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`student-card professional-card fade-in wide big ${getCardColorClass()}`}>
+      <div className="student-card-header big">
+        <div className="avatar-container">
+          <img src={avatar} alt="Student Avatar" className="student-avatar big" />
+          <div className={`avatar-status ${completionPercentage === 100 ? 'completed' : completionPercentage >= 50 ? 'in-progress' : 'pending'}`}>
+            {completionPercentage === 100 ? '✅' : completionPercentage >= 50 ? '🔄' : '⏳'}
+          </div>
+        </div>
+        <div className="student-header-info">
+          <span className="student-name big">{student.name}</span>
+          <div className="progress-section">
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: `${completionPercentage}%` }}></div>
+            </div>
+            <div className="progress-text">
+              {completedStages}/{totalStages} stages completed
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="quick-stats">
+        <div className="stat-item">
+          <span className="stat-label">Student ID:</span>
+          <span className="stat-value">{student.studentId}</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">Group:</span>
+          <span className="stat-value">{student.group || "Not assigned"}</span>
+              </div>
+        <div className="stat-item">
+          <span className="stat-label">Room:</span>
+          <span className="stat-value">{student.roomNumber || "Not assigned"}</span>
+              </div>
+      </div>
+
+      <div className="student-main-fields">
+        <div className="student-row">
+          <span className="student-label">Phone:</span>
+          <span className="student-value">{student.phone || "Not available"}</span>
+        </div>
+        <div className="student-row">
+          <span className="student-label">Aadhaar:</span>
+          <span className="student-value">{student.aadhaar || "Not available"}</span>
+        </div>
+          <div className="student-row">
+          <span className="student-label">Email:</span>
+          <span className="student-value">{student.email || "Not available"}</span>
+        </div>
+      </div>
+
+      {status && (
+        <div className="scan-status-section single">
+          <div className="scan-status-title">
+            {status.icon} {status.label} Status
+          </div>
+          <div className="scan-status-row single">
+            <span className="scan-status-label">{status.label}:</span>
+            <span className={`scan-status-chip animated-chip ${status.completed ? "yes" : "no"}`}>
+              {status.completed ? "✅ Completed" : "⏳ Pending"}
+            </span>
+            <span className="scan-status-by">
+              {status.completed ? `by ${status.verifiedBy || "Unknown"}` : "Not assigned"}
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className="all-stages-overview">
+        <div className="stages-title">All Stages Overview</div>
+        <div className="stages-grid">
+          {Object.entries(stageLabels).map(([key, stageInfo]) => {
+            const isCompleted = student[stageInfo.statusKey];
+            const isCurrent = key === currentStage;
+            return (
+              <div key={key} className={`stage-item ${isCompleted ? 'completed' : isCurrent ? 'current' : 'pending'}`}>
+                <span className="stage-icon">{stageInfo.icon}</span>
+                <span className="stage-name">{stageInfo.label}</span>
+                <span className="stage-status">{isCompleted ? '✅' : isCurrent ? '🔄' : '⏳'}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };

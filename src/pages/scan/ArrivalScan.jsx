@@ -4,7 +4,12 @@ import { useAuth } from "../../context/AuthContext";
 import Html5QrScanner from "../../components/Html5QrScanner";
 import StudentInfoCard from "../../components/StudentInfoCard";
 import ConfirmButton from "../../components/ConfirmButton";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import Confetti from "../../components/Confetti";
+import ScanErrorAnimation from "../../components/ScanErrorAnimation";
+import { useToast } from "../../components/ToastProvider";
 import "../../styles/Scanner.css";
+import { toast } from "react-hot-toast";
 
 const ArrivalScan = () => {
   const navigate = useNavigate();
@@ -17,6 +22,11 @@ const ArrivalScan = () => {
   const [studentData, setStudentData] = useState(null);
   const [scanSuccess, setScanSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showScanNext, setShowScanNext] = useState(false);
+  const { addToast } = useToast();
+  const [confettiTrigger, setConfettiTrigger] = useState(false);
+  const [scanErrorTrigger, setScanErrorTrigger] = useState(false);
+  const [showCheckmark, setShowCheckmark] = useState(false);
 
   // Capitalize each word in the name
   const capitalizeName = (name) =>
@@ -40,53 +50,150 @@ const ArrivalScan = () => {
   };
 
   const handleScanSuccess = async (rawData) => {
+    console.log("=== QR SCAN SUCCESS ===");
+    console.log("Raw QR data received:", rawData);
+    console.log("Current state - scanSuccess:", scanSuccess, "isLoading:", isLoading);
+    
     try {
       // Prevent multiple rapid scans
-      if (scanSuccess || isLoading) return;
+      if (scanSuccess || isLoading) {
+        console.log("Scan blocked - already processing");
+        return;
+      }
       
+      console.log("Parsing QR data...");
       const parsed = JSON.parse(rawData);
-      if (!parsed.studentId) throw new Error("Invalid QR code format");
+      console.log("Parsed data:", parsed);
+      
+      if (!parsed.studentId) {
+        console.log("No studentId found in QR data");
+        throw new Error("Invalid QR code format - missing studentId");
+      }
+      
+      console.log("Valid studentId found:", parsed.studentId);
       
       // Show success animation
       setScanSuccess(true);
       setIsLoading(true);
+      setConfettiTrigger(false);
+      setScanErrorTrigger(false);
+      setShowCheckmark(true);
+      console.log("Set loading states - scanSuccess: true, isLoading: true");
       
-      // Wait for animation to complete
+      // Show checkmark pulse for 600ms, then fetch student data
       setTimeout(async () => {
+        setShowCheckmark(false);
+        console.log("Starting API call to fetch student data...");
         try {
           setStudentId(parsed.studentId);
-          const res = await fetch(`/api/student/${parsed.studentId}`);
+          const apiUrl = `/api/student/${parsed.studentId}`;
+          console.log("Making API call to:", apiUrl);
+          
+          const res = await fetch(apiUrl);
+          console.log("API response status:", res.status);
           
           if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
+            if (res.status === 409) {
+              toast.error(
+                <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
+                  <span style={{fontSize:'1.5rem'}}>⚠️</span>
+                  <span><b>Duplicate Scan:</b> This student has already been scanned for this stage.</span>
+                </span>,
+                { duration: 4000 }
+              );
+              setScanErrorTrigger(true);
+              setScanSuccess(false);
+              setIsLoading(false);
+              setShowCheckmark(false);
+              return;
+            } else if (res.status === 403) {
+              throw new Error("Student not found or access denied");
+            } else if (res.status === 404) {
+              throw new Error("Student not found in database");
+            } else {
+              throw new Error(`Server error: ${res.status}`);
+            }
           }
           
           const result = await res.json();
+          console.log("Student data received:", result);
           setStudentData(result);
-          setScanning(false);
+          setConfettiTrigger(true);
+          addToast({
+            type: "success",
+            title: "Student Found!",
+            message: `Student ID: ${parsed.studentId}`,
+            duration: 3000
+          });
+          
         } catch (error) {
-          console.error("Error fetching student data:", error);
-          alert("Error fetching student data. Please try again.");
+          setScanErrorTrigger(true);
+          addToast({
+            type: "error",
+            title: "Error Fetching Student",
+            message: error.message,
+            duration: 3500
+          });
+          // Use toast instead of alert for better UX
+          toast.error(
+            <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
+              <span style={{fontSize:'1.5rem'}}>❌</span>
+              <span><b>Error:</b> {error.message}</span>
+            </span>,
+            { duration: 4000 }
+          );
         } finally {
           setScanSuccess(false);
           setIsLoading(false);
+          setShowCheckmark(false);
+          console.log("Reset loading states - scanSuccess: false, isLoading: false");
         }
-      }, 600); // Match animation duration
+      }, 600); // Checkmark pulse duration
       
     } catch (error) {
-      console.error("QR scan error:", error);
-      alert("Invalid QR scanned. Please try again.");
+      setScanErrorTrigger(true);
+      addToast({
+        type: "error",
+        title: "Invalid QR Code",
+        message: error.message,
+        duration: 3500
+      });
+      // Use toast instead of alert for better UX
+      toast.error(
+        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
+          <span style={{fontSize:'1.5rem'}}>❌</span>
+          <span><b>Invalid QR code:</b> {error.message}</span>
+        </span>,
+        { duration: 4000 }
+      );
       setScanSuccess(false);
       setIsLoading(false);
+      setShowCheckmark(false);
     }
   };
 
-  const handleReset = () => {
+  const handleReset = (mode) => {
+    if (mode === "refresh") {
+      // Only refresh the student card, don't reset everything
+      setShowScanNext(true);
+      // Optionally, re-fetch student data here if needed
+    } else {
+      setStudentId(null);
+      setStudentData(null);
+      setScanning(false);
+      setScanSuccess(false);
+      setIsLoading(false);
+      setShowScanNext(false);
+    }
+  };
+
+  const handleScanNext = () => {
     setStudentId(null);
     setStudentData(null);
     setScanning(false);
     setScanSuccess(false);
     setIsLoading(false);
+    setShowScanNext(false);
   };
 
   const handleCameraSelect = (cameraId) => {
@@ -201,9 +308,27 @@ const ArrivalScan = () => {
                   />
                   {scanning && <div className="laser-line"></div>}
                   {scanSuccess && <div className="scan-pulse"></div>}
-                  {isLoading && <div className="loading-overlay">Loading student data...</div>}
+                  {showCheckmark && (
+                    <div className="checkmark-pulse-overlay">
+                      <div className="checkmark-circle">
+                        <svg width="64" height="64" viewBox="0 0 64 64">
+                          <circle cx="32" cy="32" r="30" fill="#10b981" opacity="0.15" />
+                          <circle cx="32" cy="32" r="24" fill="#10b981" opacity="0.25" />
+                          <polyline points="22,34 30,42 44,26" fill="none" stroke="#10b981" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+                  {isLoading && (
+                    <div className="loading-overlay premium">
+                      <LoadingSpinner message="Fetching student details..." />
+                    </div>
+                  )}
+                  <Confetti trigger={confettiTrigger} />
+                  <ScanErrorAnimation trigger={scanErrorTrigger} />
                 </div>
               </div>
+              <div className="scanner-controls">
               <button 
                 className={`scanner-action-btn ${isButtonDisabled() ? 'disabled' : ''}`} 
                 onClick={handleScanToggle}
@@ -211,6 +336,7 @@ const ArrivalScan = () => {
               >
                 {getButtonText()}
               </button>
+              </div>
               {!cameraId && (
                 <p className="scanner-hint">Please select a camera first</p>
               )}
@@ -218,11 +344,13 @@ const ArrivalScan = () => {
             <div className="scanner-right">
               {studentData && (
                 <>
-                  <StudentInfoCard student={studentData} />
+                  <StudentInfoCard student={studentData} currentStage="arrival" />
                   <ConfirmButton
                     studentId={studentId}
                     stage="arrival"
                     onReset={handleReset}
+                    showScanNext={showScanNext}
+                    onScanNext={handleScanNext}
                   />
                 </>
               )}

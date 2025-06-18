@@ -15,7 +15,36 @@ const ConfirmButton = ({ studentId, stage, onReset }) => {
         body: JSON.stringify({ studentId, volunteerName }),
       });
 
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Handle specific error cases
+        if (res.status === 409) {
+          // Already completed
+          toast.error(
+            <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
+              <span style={{fontSize:'1.5rem'}}>⚠️</span>
+              <span><b>{stage.charAt(0).toUpperCase() + stage.slice(1)} already completed</b> for {studentId}</span>
+            </span>,
+            { style: toastErrorStyle, icon: null, duration: 4000 }
+          );
+        } else if (res.status === 404) {
+          // Student not found
+          toast.error(
+            <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
+              <span style={{fontSize:'1.5rem'}}>❌</span>
+              <span><b>Student not found:</b> {studentId}</span>
+            </span>,
+            { style: toastErrorStyle, icon: null, duration: 4000 }
+          );
+        } else {
+          // Generic error
+          throw new Error(data.error || 'Failed to update status');
+        }
+        return;
+      }
+
+      // Success case
       toast.success(
         <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
           <span style={{fontSize:'1.5rem'}}>✅</span>
@@ -24,13 +53,14 @@ const ConfirmButton = ({ studentId, stage, onReset }) => {
         { style: toastSuccessStyle, icon: null, duration: 3500 }
       );
       onReset();
-    } catch {
+    } catch (error) {
+      console.error('Confirm button error:', error);
       toast.error(
         <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
           <span style={{fontSize:'1.5rem'}}>❌</span>
-          <span><b>Failed to update status.</b></span>
+          <span><b>Failed to update status:</b> {error.message}</span>
         </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
+        { style: toastErrorStyle, icon: null, duration: 4000 }
       );
     }
   };
