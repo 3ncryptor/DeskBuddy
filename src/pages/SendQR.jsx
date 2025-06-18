@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/SendQR.css";
 import scanQR from "../assets/scanQR.svg";
 import { toastErrorStyle, toastSuccessStyle } from '../styles/toastStyles';
@@ -12,6 +13,7 @@ const SendQR = () => {
   const [csvData, setCsvData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fileName, setFileName] = useState("");
+  const [uploadedFile, setUploadedFile] = useState(null);
 
   // Capitalize each word in the name
   const capitalizeName = (name) =>
@@ -38,13 +40,55 @@ const SendQR = () => {
     const file = e.target.files[0];
     if (!file) return;
 
+    // Validate file type
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+      toast.error(
+        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
+          <span style={{fontSize:'1.5rem'}}>⚠️</span>
+          <span><b>Please upload a CSV file only.</b></span>
+        </span>,
+        { style: toastErrorStyle, icon: null, duration: 3500 }
+      );
+      return;
+    }
+
     setFileName(file.name);
+    setUploadedFile(file);
+    
     const reader = new FileReader();
 
     reader.onload = (event) => {
       const text = event.target.result;
       const lines = text.split("\n").filter(Boolean);
-      const headers = lines[0].split(",").map((h) => h.trim());
+      
+      if (lines.length < 2) {
+        toast.error(
+          <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
+            <span style={{fontSize:'1.5rem'}}>⚠️</span>
+            <span><b>CSV file must have at least a header row and one data row.</b></span>
+          </span>,
+          { style: toastErrorStyle, icon: null, duration: 3500 }
+        );
+        return;
+      }
+      
+      const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
+      
+      // Validate required columns
+      const requiredColumns = ['name', 'email', 'studentid'];
+      const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+      
+      if (missingColumns.length > 0) {
+        toast.error(
+          <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
+            <span style={{fontSize:'1.5rem'}}>⚠️</span>
+            <span><b>Missing required columns:</b> {missingColumns.join(', ')}</span>
+          </span>,
+          { style: toastErrorStyle, icon: null, duration: 3500 }
+        );
+        return;
+      }
+      
       const students = lines.slice(1).map((line) => {
         const values = line.split(",").map((v) => v.trim());
         const student = {};
@@ -52,7 +96,8 @@ const SendQR = () => {
           student[header] = values[idx];
         });
         return student;
-      });
+      }).filter(student => student.name && student.email && student.studentid);
+      
       setCsvData(students);
       toast.success(
         <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
@@ -67,7 +112,7 @@ const SendQR = () => {
   };
 
   const handleSend = async () => {
-    if (csvData.length === 0) {
+    if (!uploadedFile) {
       toast.error(
         <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
           <span style={{fontSize:'1.5rem'}}>⚠️</span>
@@ -81,27 +126,48 @@ const SendQR = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/send-qr", {
+      const formData = new FormData();
+      formData.append('csvFile', uploadedFile);
+
+      const res = await fetch("http://localhost:3001/api/email/upload-csv", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ students: csvData }),
+        body: formData,
       });
 
-      if (!res.ok) throw new Error();
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || 'Failed to send emails');
+      }
+
+      // Show detailed results
+      const { summary } = result;
+      const { emailSummary } = summary;
+      
       toast.success(
         <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
           <span style={{fontSize:'1.5rem'}}>✅</span>
-          <span><b>QR emails sent successfully!</b></span>
+          <span>
+            <b>Emails sent successfully!</b><br/>
+            {emailSummary.successful} sent, {emailSummary.failed} failed
+          </span>
         </span>,
-        { style: toastSuccessStyle, icon: null, duration: 3500 }
+        { style: toastSuccessStyle, icon: null, duration: 5000 }
       );
-    } catch {
+
+      // Clear the form
+      setCsvData([]);
+      setFileName("");
+      setUploadedFile(null);
+      
+    } catch (error) {
+      console.error('Email sending error:', error);
       toast.error(
         <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
           <span style={{fontSize:'1.5rem'}}>❌</span>
-          <span><b>Failed to send QR emails.</b> Please try again.</span>
+          <span><b>Failed to send emails:</b> {error.message}</span>
         </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
+        { style: toastErrorStyle, icon: null, duration: 5000 }
       );
     } finally {
       setIsLoading(false);
@@ -111,9 +177,17 @@ const SendQR = () => {
   const handleFileDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file && file.type === "text/csv") {
+    if (file && (file.type === "text/csv" || file.name.toLowerCase().endsWith('.csv'))) {
       const event = { target: { files: [file] } };
       handleCSVUpload(event);
+    } else {
+      toast.error(
+        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
+          <span style={{fontSize:'1.5rem'}}>⚠️</span>
+          <span><b>Please drop a CSV file only.</b></span>
+        </span>,
+        { style: toastErrorStyle, icon: null, duration: 3500 }
+      );
     }
   };
 
@@ -168,6 +242,11 @@ const SendQR = () => {
 
         {/* Main Content */}
         <main className="sendqr-main">
+          {isLoading && (
+            <div className="loading-overlay">
+              <LoadingSpinner message="Sending QR codes to students..." />
+            </div>
+          )}
           <div className="sendqr-content premium-glass">
             <div className="sheen"></div>
             <div className="sendqr-header" style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>

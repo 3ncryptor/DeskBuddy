@@ -13,6 +13,7 @@
     "firebase": "^11.9.1",
     "framer-motion": "^12.18.1",
     "html5-qrcode": "^2.3.8",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^0.517.0",
     "motion": "^12.18.1",
     "react": "^19.1.0",
