@@ -30,7 +30,7 @@ function AppLayout({ children, theme, onToggleTheme }) {
   return (
     <div className={theme === 'dark' ? 'app dark' : 'app'}>
       {!hideSidebar && <Sidebar theme={theme} onToggleTheme={onToggleTheme} />}
-      <div className="main-content" style={{ marginLeft: !hideSidebar ? 250 : 0, transition: 'margin 0.3s' }}>
+      <div className="main-content" style={{ marginLeft: (window.innerWidth > 900 && !hideSidebar) ? 250 : 0, transition: 'margin 0.3s' }}>
         {children}
       </div>
     </div>

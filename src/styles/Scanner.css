@@ -765,11 +765,13 @@
 }
 
 .app.dark .scanner-page {
-  background: #18181b;
+  background: linear-gradient(120deg, #18181b 0%, #23272f 100%);
 }
 .app.dark .scanner-header {
-  background: rgba(36,37,42,0.92);
-  border-bottom: 1px solid #23272f;
+  background: rgba(36,37,42,0.94);
+  border-bottom: 1px solid rgba(129,140,248,0.18);
+  box-shadow: 0 8px 40px 0 rgba(0,0,0,0.38), 0 1.5px 8px 0 #818cf822 inset;
+  backdrop-filter: blur(22px) saturate(180%);
 }
 .app.dark .back-btn {
   background: #23272f;
@@ -782,14 +784,55 @@
   border-color: #818cf8;
 }
 .app.dark .page-title {
-  color: #fff;
+  color: #f3f4f6;
+  font-size: 1.7rem;
+  font-weight: 800;
 }
 .app.dark .page-description {
-  color: #d1d5db;
+  color: #bfc7d5;
+  font-size: 1.05rem;
 }
 .app.dark .scanner-box {
-  background: rgba(24,24,27,0.92);
-  border: 2.5px solid #23272f;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.18);
+  background: rgba(24,24,27,0.94);
+  border: 2.5px solid rgba(129,140,248,0.13);
+  box-shadow: 0 2px 16px 0 #818cf822, 0 1.5px 8px 0 #23272f44 inset;
+  transition: box-shadow 0.25s, background 0.25s, border-color 0.25s, transform 0.18s cubic-bezier(.4,0,.2,1);
+}
+.app.dark .scanner-box:hover {
+  border-color: #818cf8;
+  box-shadow: 0 8px 32px 0 #818cf844, 0 1.5px 8px 0 #23272f44 inset;
+  transform: translateY(-6px) scale(1.03);
+}
+.app.dark .camera-dropdown-btn {
+  background: #23272f;
+  color: #a5b4fc;
+  border: 2px solid #818cf8;
+  box-shadow: 0 2px 8px 0 #818cf822;
+}
+.app.dark .camera-dropdown-btn:hover {
+  background: #818cf8;
+  color: #23272f;
+  border-color: #a5b4fc;
+}
+.app.dark .camera-dropdown-menu {
+  background: #23272f;
+  border: 2px solid #818cf8;
+  box-shadow: 0 2px 8px 0 #818cf822;
+}
+.app.dark .camera-option {
+  color: #a5b4fc;
+}
+.app.dark .camera-option.selected {
+  background: #818cf8;
+  color: #23272f;
+}
+.app.dark .scanner-action-btn {
+  background: linear-gradient(90deg, #818cf8 60%, #38bdf8 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px 0 #818cf822;
+}
+.app.dark .scanner-action-btn:hover:not(.disabled) {
+  background: linear-gradient(90deg, #a5b4fc 60%, #818cf8 100%);
+  box-shadow: 0 4px 16px 0 #818cf822;
 }
   

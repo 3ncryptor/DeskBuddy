@@ -239,9 +239,6 @@ const ArrivalScan = () => {
             </div>
             <div className="header-actions">
               <div className="user-info">
-                <div className="user-avatar">
-                  {getUserName().charAt(0).toUpperCase()}
-                </div>
                 <div className="user-details">
                   <span className="user-name">{getUserName()}</span>
                   <span className="user-role">Administrator</span>
