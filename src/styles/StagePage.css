@@ -1,7 +1,8 @@
 /* Professional Stage Page Styles */
 .stage-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e0e7ef 0%, #cfd9e9 100%);
+  /* background: linear-gradient(135deg, #e0e7ef 0%, #cfd9e9 100%); */
+  background: transparent;
   padding: 0;
   margin: 0;
   position: relative;
@@ -291,5 +292,66 @@
   .card-description {
     font-size: var(--font-size-xs);
   }
+}
+
+.app.dark .stage-page {
+  background: #18181b;
+}
+.app.dark .stage-header {
+  background: rgba(36,37,42,0.92);
+  border-bottom: 1.5px solid #23272f;
+  box-shadow: 0 8px 40px 0 rgba(0,0,0,0.28);
+}
+.app.dark .back-btn {
+  background: #23272f;
+  color: #a5b4fc;
+  border: 1.5px solid #a5b4fc;
+}
+.app.dark .back-btn:hover {
+  background: #a5b4fc;
+  color: #23272f;
+  border-color: #818cf8;
+}
+.app.dark .page-title {
+  color: #fff;
+}
+.app.dark .page-description {
+  color: #d1d5db;
+}
+.app.dark .stage-cards {
+  background: rgba(24,24,27,0.92);
+  box-shadow: 0 4px 32px 0 rgba(0,0,0,0.18);
+}
+.app.dark .stage-card {
+  background: rgba(24,24,27,0.92);
+  border: 1.5px solid #23272f;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.18);
+}
+.app.dark .stage-card.primary {
+  background: linear-gradient(135deg, rgba(24,24,27,0.92) 0%, #23272f 100%);
+  border-color: #a5b4fc;
+}
+.app.dark .stage-card.primary:hover {
+  background: #23272f;
+  border-color: #818cf8;
+}
+.app.dark .stage-card.secondary {
+  background: rgba(36,37,42,0.45);
+  border-color: #23272f;
+}
+.app.dark .card-title {
+  color: #fff;
+}
+.app.dark .card-description {
+  color: #d1d5db;
+}
+.app.dark .card-icon {
+  background: #23272f;
+}
+.app.dark .stage-card.primary .card-icon {
+  background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 100%);
+}
+.app.dark .stage-card.secondary .card-icon {
+  background: #23272f;
 }
   

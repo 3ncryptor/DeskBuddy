@@ -845,4 +845,55 @@
   justify-content: center;
   z-index: 1000;
 }
+
+.app.dark .sendqr-page {
+  background: #18181b;
+}
+.app.dark .sendqr-header-section {
+  background: rgba(36,37,42,0.92);
+  border-bottom: 1px solid #23272f;
+}
+.app.dark .back-btn,
+.app.dark .logout-btn {
+  background: #23272f;
+  color: #a5b4fc;
+  border: 1px solid #a5b4fc;
+}
+.app.dark .back-btn:hover,
+.app.dark .logout-btn:hover {
+  background: #a5b4fc;
+  color: #23272f;
+  border-color: #818cf8;
+}
+.app.dark .page-title {
+  color: #fff;
+}
+.app.dark .page-description {
+  color: #d1d5db;
+}
+.app.dark .sendqr-content {
+  background: rgba(24,24,27,0.92);
+  border: 1.5px solid #23272f;
+  box-shadow: 0 8px 40px 0 rgba(0,0,0,0.18);
+}
+.app.dark .sendqr-header {
+  background: rgba(36,37,42,0.65);
+  border-bottom: 1px solid #23272f;
+}
+.app.dark .sendqr-header h1 {
+  background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.app.dark .user-info {
+  background: rgba(36,37,42,0.28);
+  border: 1px solid #23272f;
+}
+.app.dark .user-name {
+  color: #fff;
+}
+.app.dark .user-role {
+  color: #d1d5db;
+}
   
