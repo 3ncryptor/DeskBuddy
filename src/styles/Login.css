@@ -487,7 +487,7 @@
   padding: 40px 32px;
   width: 100%;
   max-width: 480px;
-  max-height: 920px;
+  max-height: 100%;
   box-shadow: 0 32px 64px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0
     rgba(255, 255, 255, 0.8);
   animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1);
