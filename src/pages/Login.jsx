@@ -8,9 +8,8 @@ import {
 import { auth, provider } from "../services/firebase";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
-import toast from 'react-hot-toast';
+import { useToast } from '../components/ToastProvider';
 import loginIllustration from '../assets/Login.svg';
-import { toastErrorStyle, toastSuccessStyle } from '../styles/toastStyles';
 
 const Login = () => {
   const [mode, setMode] = useState("login");
@@ -19,27 +18,24 @@ const Login = () => {
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
       await signInWithPopup(auth, provider);
-      toast.success(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>✅</span>
-          <span><b>Login Successful</b></span>
-        </span>,
-        { style: toastSuccessStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'success',
+        title: 'Login Successful',
+        duration: 3500
+      });
       navigate('/dashboard');
     } catch (error) {
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>❌</span>
-          <span><b>{error.message || 'Google Login Failed'}</b></span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'error',
+        title: error.message || 'Google Login Failed',
+        duration: 3500
+      });
     } finally {
       setIsLoading(false);
     }
@@ -47,34 +43,28 @@ const Login = () => {
 
   const handleEmailLogin = async () => {
     if (!email || !password) {
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>⚠️</span>
-          <span><b>Please enter both email and password.</b></span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'error',
+        title: 'Please enter both email and password.',
+        duration: 3500
+      });
       return;
     }
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      toast.success(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>✅</span>
-          <span><b>Login Successful</b></span>
-        </span>,
-        { style: toastSuccessStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'success',
+        title: 'Login Successful',
+        duration: 3500
+      });
       navigate('/dashboard');
     } catch (error) {
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>❌</span>
-          <span><b>{error.message || 'Login Failed'}</b></span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'error',
+        title: error.message || 'Login Failed',
+        duration: 3500
+      });
     } finally {
       setIsLoading(false);
     }
@@ -82,74 +72,60 @@ const Login = () => {
 
   const handleSignup = async () => {
     if (!email || !password || !name) {
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>⚠️</span>
-          <span><b>Please fill all fields.</b></span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'error',
+        title: 'Please fill all fields.',
+        duration: 3500
+      });
       return;
     }
     if (password.length < 6) {
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>⚠️</span>
-          <span><b>Password must be at least 6 characters.</b></span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'error',
+        title: 'Password must be at least 6 characters.',
+        duration: 3500
+      });
       return;
     }
     setIsLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      toast.success(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>✅</span>
-          <span><b>Account Created</b></span>
-        </span>,
-        { style: toastSuccessStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'success',
+        title: 'Account Created',
+        duration: 3500
+      });
       navigate('/dashboard');
     } catch (error) {
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>❌</span>
-          <span><b>{error.message || 'Signup Failed'}</b></span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'error',
+        title: error.message || 'Signup Failed',
+        duration: 3500
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleResetPassword = async () => {
-    if (!email) return toast.error(
-      <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-        <span style={{fontSize:'1.5rem'}}>⚠️</span>
-        <span><b>Enter email to reset</b></span>
-      </span>,
-      { style: toastErrorStyle, icon: null, duration: 3500 }
-    );
+    if (!email) return addToast({
+      type: 'error',
+      title: 'Enter email to reset',
+      duration: 3500
+    });
     try {
       await sendPasswordResetEmail(auth, email);
-      toast.success(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>📩</span>
-          <span><b>Reset email sent</b></span>
-        </span>,
-        { style: toastSuccessStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'success',
+        title: 'Reset email sent',
+        duration: 3500
+      });
     } catch (error) {
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>❌</span>
-          <span><b>{error.message || 'Failed to send reset link'}</b></span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'error',
+        title: error.message || 'Failed to send reset link',
+        duration: 3500
+      });
     }
   };
 

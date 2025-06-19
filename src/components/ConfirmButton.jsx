@@ -1,11 +1,11 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import toast from 'react-hot-toast';
-import { toastErrorStyle, toastSuccessStyle } from '../styles/toastStyles';
+import { useToast } from '../components/ToastProvider';
 
 const ConfirmButton = ({ studentId, stage, onReset }) => {
   const { user } = useAuth();
   const volunteerName = user?.displayName || "Anonymous";
+  const { addToast } = useToast();
 
   const handleConfirm = async () => {
     try {
@@ -21,22 +21,18 @@ const ConfirmButton = ({ studentId, stage, onReset }) => {
         // Handle specific error cases
         if (res.status === 409) {
           // Already completed
-          toast.error(
-            <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-              <span style={{fontSize:'1.5rem'}}>⚠️</span>
-              <span><b>{stage.charAt(0).toUpperCase() + stage.slice(1)} already completed</b> for {studentId}</span>
-            </span>,
-            { style: toastErrorStyle, icon: null, duration: 4000 }
-          );
+          addToast({
+            type: 'warning',
+            title: `${stage.charAt(0).toUpperCase() + stage.slice(1)} already completed for ${studentId}`,
+            duration: 4000
+          });
         } else if (res.status === 404) {
           // Student not found
-          toast.error(
-            <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-              <span style={{fontSize:'1.5rem'}}>❌</span>
-              <span><b>Student not found:</b> {studentId}</span>
-            </span>,
-            { style: toastErrorStyle, icon: null, duration: 4000 }
-          );
+          addToast({
+            type: 'error',
+            title: `Student not found: ${studentId}`,
+            duration: 4000
+          });
         } else {
           // Generic error
           throw new Error(data.error || 'Failed to update status');
@@ -45,23 +41,18 @@ const ConfirmButton = ({ studentId, stage, onReset }) => {
       }
 
       // Success case
-      toast.success(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>✅</span>
-          <span><b>{stage.charAt(0).toUpperCase() + stage.slice(1)} confirmed</b> for {studentId}</span>
-        </span>,
-        { style: toastSuccessStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'success',
+        title: `${stage.charAt(0).toUpperCase() + stage.slice(1)} confirmed for ${studentId}`,
+        duration: 3500
+      });
       onReset();
     } catch (error) {
-      console.error('Confirm button error:', error);
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>❌</span>
-          <span><b>Failed to update status:</b> {error.message}</span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 4000 }
-      );
+      addToast({
+        type: 'error',
+        title: `Failed to update status: ${error.message}`,
+        duration: 4000
+      });
     }
   };
 

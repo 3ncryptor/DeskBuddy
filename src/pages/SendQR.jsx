@@ -4,8 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/SendQR.css";
 import scanQR from "../assets/scanQR.svg";
-import { toastErrorStyle, toastSuccessStyle } from '../styles/toastStyles';
-import toast from 'react-hot-toast';
+import { useToast } from '../components/ToastProvider';
 
 const SendQR = () => {
   const navigate = useNavigate();
@@ -14,6 +13,7 @@ const SendQR = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [fileName, setFileName] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
+  const { addToast } = useToast();
 
   // Capitalize each word in the name
   const capitalizeName = (name) =>
@@ -42,13 +42,11 @@ const SendQR = () => {
 
     // Validate file type
     if (!file.name.toLowerCase().endsWith('.csv')) {
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>⚠️</span>
-          <span><b>Please upload a CSV file only.</b></span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'error',
+        title: 'Please upload a CSV file only.',
+        duration: 3500
+      });
       return;
     }
 
@@ -62,13 +60,11 @@ const SendQR = () => {
       const lines = text.split("\n").filter(Boolean);
       
       if (lines.length < 2) {
-        toast.error(
-          <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-            <span style={{fontSize:'1.5rem'}}>⚠️</span>
-            <span><b>CSV file must have at least a header row and one data row.</b></span>
-          </span>,
-          { style: toastErrorStyle, icon: null, duration: 3500 }
-        );
+        addToast({
+          type: 'error',
+          title: 'CSV file must have at least a header row and one data row.',
+          duration: 3500
+        });
         return;
       }
       
@@ -79,13 +75,11 @@ const SendQR = () => {
       const missingColumns = requiredColumns.filter(col => !headers.includes(col));
       
       if (missingColumns.length > 0) {
-        toast.error(
-          <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-            <span style={{fontSize:'1.5rem'}}>⚠️</span>
-            <span><b>Missing required columns:</b> {missingColumns.join(', ')}</span>
-          </span>,
-          { style: toastErrorStyle, icon: null, duration: 3500 }
-        );
+        addToast({
+          type: 'error',
+          title: `Missing required columns: ${missingColumns.join(', ')}`,
+          duration: 3500
+        });
         return;
       }
       
@@ -99,13 +93,11 @@ const SendQR = () => {
       }).filter(student => student.name && student.email && student.studentid);
       
       setCsvData(students);
-      toast.success(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>📄</span>
-          <span><b>CSV loaded:</b> {students.length} students found!</span>
-        </span>,
-        { style: toastSuccessStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'success',
+        title: `CSV loaded: ${students.length} students found!`,
+        duration: 3500
+      });
     };
 
     reader.readAsText(file);
@@ -113,13 +105,11 @@ const SendQR = () => {
 
   const handleSend = async () => {
     if (!uploadedFile) {
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>⚠️</span>
-          <span><b>Please upload a CSV file first.</b></span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'error',
+        title: 'Please upload a CSV file first.',
+        duration: 3500
+      });
       return;
     }
 
@@ -144,16 +134,11 @@ const SendQR = () => {
       const { summary } = result;
       const { emailSummary } = summary;
       
-      toast.success(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>✅</span>
-          <span>
-            <b>Emails sent successfully!</b><br/>
-            {emailSummary.successful} sent, {emailSummary.failed} failed
-          </span>
-        </span>,
-        { style: toastSuccessStyle, icon: null, duration: 5000 }
-      );
+      addToast({
+        type: 'success',
+        title: `Emails sent successfully! ${emailSummary.successful} sent, ${emailSummary.failed} failed`,
+        duration: 5000
+      });
 
       // Clear the form
       setCsvData([]);
@@ -161,14 +146,11 @@ const SendQR = () => {
       setUploadedFile(null);
       
     } catch (error) {
-      console.error('Email sending error:', error);
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>❌</span>
-          <span><b>Failed to send emails:</b> {error.message}</span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 5000 }
-      );
+      addToast({
+        type: 'error',
+        title: `Failed to send emails: ${error.message}`,
+        duration: 5000
+      });
     } finally {
       setIsLoading(false);
     }
@@ -181,13 +163,11 @@ const SendQR = () => {
       const event = { target: { files: [file] } };
       handleCSVUpload(event);
     } else {
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>⚠️</span>
-          <span><b>Please drop a CSV file only.</b></span>
-        </span>,
-        { style: toastErrorStyle, icon: null, duration: 3500 }
-      );
+      addToast({
+        type: 'error',
+        title: 'Please drop a CSV file only.',
+        duration: 3500
+      });
     }
   };
 

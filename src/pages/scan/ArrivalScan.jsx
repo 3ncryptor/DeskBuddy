@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Html5QrScanner from "../../components/Html5QrScanner";
@@ -9,7 +9,6 @@ import Confetti from "../../components/Confetti";
 import ScanErrorAnimation from "../../components/ScanErrorAnimation";
 import { useToast } from "../../components/ToastProvider";
 import "../../styles/Scanner.css";
-import { toast } from "react-hot-toast";
 
 const ArrivalScan = () => {
   const navigate = useNavigate();
@@ -27,6 +26,7 @@ const ArrivalScan = () => {
   const [confettiTrigger, setConfettiTrigger] = useState(false);
   const [scanErrorTrigger, setScanErrorTrigger] = useState(false);
   const [showCheckmark, setShowCheckmark] = useState(false);
+  const processingRef = useRef(false);
 
   // Capitalize each word in the name
   const capitalizeName = (name) =>
@@ -50,6 +50,8 @@ const ArrivalScan = () => {
   };
 
   const handleScanSuccess = async (rawData) => {
+    if (processingRef.current) return;
+    processingRef.current = true;
     console.log("=== QR SCAN SUCCESS ===");
     console.log("Raw QR data received:", rawData);
     console.log("Current state - scanSuccess:", scanSuccess, "isLoading:", isLoading);
@@ -94,13 +96,12 @@ const ArrivalScan = () => {
           
           if (!res.ok) {
             if (res.status === 409) {
-              toast.error(
-                <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-                  <span style={{fontSize:'1.5rem'}}>⚠️</span>
-                  <span><b>Duplicate Scan:</b> This student has already been scanned for this stage.</span>
-                </span>,
-                { duration: 4000 }
-              );
+              addToast({
+                type: "error",
+                title: "Duplicate Scan",
+                message: "This student has already been scanned for this stage.",
+                duration: 4000
+              });
               setScanErrorTrigger(true);
               setScanSuccess(false);
               setIsLoading(false);
@@ -134,14 +135,6 @@ const ArrivalScan = () => {
             message: error.message,
             duration: 3500
           });
-          // Use toast instead of alert for better UX
-          toast.error(
-            <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-              <span style={{fontSize:'1.5rem'}}>❌</span>
-              <span><b>Error:</b> {error.message}</span>
-            </span>,
-            { duration: 4000 }
-          );
         } finally {
           setScanSuccess(false);
           setIsLoading(false);
@@ -158,17 +151,11 @@ const ArrivalScan = () => {
         message: error.message,
         duration: 3500
       });
-      // Use toast instead of alert for better UX
-      toast.error(
-        <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-          <span style={{fontSize:'1.5rem'}}>❌</span>
-          <span><b>Invalid QR code:</b> {error.message}</span>
-        </span>,
-        { duration: 4000 }
-      );
       setScanSuccess(false);
       setIsLoading(false);
       setShowCheckmark(false);
+    } finally {
+      setTimeout(() => { processingRef.current = false; }, 1000); // allow next scan after 1s
     }
   };
 
@@ -185,6 +172,7 @@ const ArrivalScan = () => {
       setIsLoading(false);
       setShowScanNext(false);
     }
+    processingRef.current = false;
   };
 
   const handleScanNext = () => {
