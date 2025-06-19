@@ -74,17 +74,18 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="dashboard-header-right">
-          <div className="dashboard-header-avatar-img animated-avatar simple-human-avatar">
-            <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="45" cy="45" r="44" fill="#F4F4F4" stroke="#E3E8F7" strokeWidth="2"/>
-              <ellipse cx="45" cy="38" rx="18" ry="18" fill="#F9D7B5"/>
-              <ellipse cx="45" cy="70" rx="24" ry="12" fill="#E3E8F7"/>
-              <ellipse cx="45" cy="38" rx="10" ry="10" fill="#F7C89A"/>
-              <ellipse cx="38" cy="36" rx="2.2" ry="2.5" fill="#222b45"/>
-              <ellipse cx="52" cy="36" rx="2.2" ry="2.5" fill="#222b45"/>
-              <path d="M41 44 Q45 48 49 44" stroke="#B8875A" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+          <button
+            className="dashboard-header-signout mobile-only"
+            onClick={logout}
+            style={{ display: 'none' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16,17 21,12 16,7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg>
-          </div>
+            Sign Out
+          </button>
         </div>
       </div>
       {/* Quick Actions Section */}

@@ -107,16 +107,7 @@
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 0.9rem;
+  display: none !important;
 }
 
 .user-details {
@@ -847,53 +838,67 @@
 }
 
 .app.dark .sendqr-page {
-  background: #18181b;
+  background: linear-gradient(120deg, #18181b 0%, #23272f 100%);
 }
 .app.dark .sendqr-header-section {
-  background: rgba(36,37,42,0.92);
-  border-bottom: 1px solid #23272f;
+  background: rgba(36,37,42,0.94);
+  border-bottom: 1px solid rgba(129,140,248,0.18);
+  box-shadow: 0 8px 40px 0 rgba(0,0,0,0.38), 0 1.5px 8px 0 #818cf822 inset;
+  backdrop-filter: blur(22px) saturate(180%);
+}
+.app.dark .sendqr-content {
+  background: rgba(24,24,27,0.94);
+  border: 1.5px solid rgba(129,140,248,0.13);
+  box-shadow: 0 8px 40px 0 #818cf822, 0 1.5px 8px 0 #23272f44 inset;
+  backdrop-filter: blur(20px) saturate(180%);
+}
+.app.dark .sendqr-header {
+  background: rgba(36,37,42,0.80);
+  border-bottom: 1px solid rgba(129,140,248,0.13);
+}
+.app.dark .sendqr-header h1 {
+  background: linear-gradient(135deg, #a5b4fc 0%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+.app.dark .user-info {
+  background: rgba(36,37,42,0.32);
+  border: 1px solid rgba(129,140,248,0.13);
+  box-shadow: 0 2px 8px 0 #818cf822;
+}
+.app.dark .user-name {
+  color: #f3f4f6;
+  font-size: 1.05rem;
+}
+.app.dark .user-role {
+  color: #bfc7d5;
+  font-size: 0.85rem;
 }
 .app.dark .back-btn,
 .app.dark .logout-btn {
   background: #23272f;
   color: #a5b4fc;
   border: 1px solid #a5b4fc;
+  box-shadow: 0 2px 8px 0 #818cf822;
+  transition: box-shadow 0.18s, background 0.18s, color 0.18s;
 }
 .app.dark .back-btn:hover,
 .app.dark .logout-btn:hover {
   background: #a5b4fc;
   color: #23272f;
   border-color: #818cf8;
+  box-shadow: 0 4px 16px 0 #818cf822;
 }
 .app.dark .page-title {
-  color: #fff;
+  color: #f3f4f6;
+  font-size: 1.7rem;
+  font-weight: 800;
 }
 .app.dark .page-description {
-  color: #d1d5db;
-}
-.app.dark .sendqr-content {
-  background: rgba(24,24,27,0.92);
-  border: 1.5px solid #23272f;
-  box-shadow: 0 8px 40px 0 rgba(0,0,0,0.18);
-}
-.app.dark .sendqr-header {
-  background: rgba(36,37,42,0.65);
-  border-bottom: 1px solid #23272f;
-}
-.app.dark .sendqr-header h1 {
-  background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.app.dark .user-info {
-  background: rgba(36,37,42,0.28);
-  border: 1px solid #23272f;
-}
-.app.dark .user-name {
-  color: #fff;
-}
-.app.dark .user-role {
-  color: #d1d5db;
+  color: #bfc7d5;
+  font-size: 1.05rem;
 }
   

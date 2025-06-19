@@ -63,35 +63,32 @@ const Sidebar = ({ onToggleTheme, theme }) => {
         </div>
         <nav className="sidebar-nav">
           {navLinks.map(link => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                'sidebar-link' + (isActive || location.pathname.startsWith(link.to) ? ' active' : '')
-              }
-              onClick={() => setMobileOpen(false)} // close on nav click
-            >
-              <span className="sidebar-icon">{link.icon}</span>
-              {link.label}
-            </NavLink>
+            (link.to === '/dashboard' || window.innerWidth > 900) && (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  'sidebar-link' + (isActive || location.pathname.startsWith(link.to) ? ' active' : '')
+                }
+                onClick={() => setMobileOpen(false)} // close on nav click
+              >
+                <span className="sidebar-icon">{link.icon}</span>
+                {link.label}
+              </NavLink>
+            )
           ))}
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-user">
-            <div className="sidebar-avatar">{userName.charAt(0).toUpperCase()}</div>
+            {window.innerWidth > 900 && (
+              <div className="sidebar-avatar">{userName.charAt(0).toUpperCase()}</div>
+            )}
             <div className="sidebar-user-details">
               <span className="sidebar-user-name">{userName}</span>
               <span className="sidebar-user-role">{role}</span>
             </div>
           </div>
           <button className="sidebar-logout" onClick={logout}>Sign Out</button>
-          <div className="sidebar-toggle">
-            <label className="toggle-switch">
-              <input type="checkbox" checked={theme === 'dark'} onChange={onToggleTheme} />
-              <span className="slider"></span>
-            </label>
-            <span className="toggle-label">{theme === 'dark' ? 'Dark' : 'Light'} Mode</span>
-          </div>
         </div>
       </aside>
     </>

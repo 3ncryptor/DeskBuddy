@@ -295,12 +295,13 @@
 }
 
 .app.dark .stage-page {
-  background: #18181b;
+  background: linear-gradient(120deg, #18181b 0%, #23272f 100%);
 }
 .app.dark .stage-header {
-  background: rgba(36,37,42,0.92);
-  border-bottom: 1.5px solid #23272f;
-  box-shadow: 0 8px 40px 0 rgba(0,0,0,0.28);
+  background: rgba(36,37,42,0.94);
+  border-bottom: 1.5px solid rgba(129,140,248,0.18);
+  box-shadow: 0 8px 40px 0 rgba(0,0,0,0.38), 0 1.5px 8px 0 #818cf822 inset;
+  backdrop-filter: blur(22px) saturate(180%);
 }
 .app.dark .back-btn {
   background: #23272f;
@@ -319,39 +320,49 @@
   color: #d1d5db;
 }
 .app.dark .stage-cards {
-  background: rgba(24,24,27,0.92);
-  box-shadow: 0 4px 32px 0 rgba(0,0,0,0.18);
+  background: rgba(24,24,27,0.94);
+  box-shadow: 0 4px 32px 0 #818cf822, 0 1.5px 8px 0 #23272f44 inset;
 }
 .app.dark .stage-card {
   background: rgba(24,24,27,0.92);
-  border: 1.5px solid #23272f;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.18);
+  border: 1.5px solid rgba(129,140,248,0.10);
+  box-shadow: 0 2px 16px 0 #818cf822, 0 1.5px 8px 0 #23272f44 inset;
+  transition: box-shadow 0.25s, background 0.25s, border-color 0.25s, transform 0.18s cubic-bezier(.4,0,.2,1);
 }
 .app.dark .stage-card.primary {
-  background: linear-gradient(135deg, rgba(24,24,27,0.92) 0%, #23272f 100%);
+  background: linear-gradient(135deg, #23272f 0%, #18181b 100%);
   border-color: #a5b4fc;
 }
 .app.dark .stage-card.primary:hover {
-  background: #23272f;
+  background: rgba(36,37,42,0.98);
   border-color: #818cf8;
+  box-shadow: 0 8px 32px 0 #818cf844, 0 1.5px 8px 0 #23272f44 inset;
+  transform: translateY(-6px) scale(1.03);
 }
 .app.dark .stage-card.secondary {
-  background: rgba(36,37,42,0.45);
+  background: rgba(36,37,42,0.75);
   border-color: #23272f;
 }
 .app.dark .card-title {
-  color: #fff;
+  color: #f3f4f6;
+  font-size: 1.15rem;
+  font-weight: 800;
 }
 .app.dark .card-description {
-  color: #d1d5db;
+  color: #bfc7d5;
+  font-size: 1.03rem;
 }
 .app.dark .card-icon {
-  background: #23272f;
+  background: linear-gradient(135deg, #23272f 0%, #18181b 100%);
+  box-shadow: 0 2px 8px 0 #818cf822;
 }
 .app.dark .stage-card.primary .card-icon {
   background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 100%);
 }
 .app.dark .stage-card.secondary .card-icon {
   background: #23272f;
+}
+.app.dark .stage-card:active {
+  box-shadow: 0 4px 16px 0 #818cf822;
 }
   
