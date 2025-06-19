@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   signInWithPopup,
   signInWithEmailAndPassword,
@@ -9,16 +9,48 @@ import { auth, provider } from "../services/firebase";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import { useToast } from '../components/ToastProvider';
-import loginIllustration from '../assets/Login.svg';
+import logo from '../assets/Login.svg';
+
+// SVG ICONS
+const UserIcon = (props) => (
+  <svg viewBox="0 0 24 24" width={props.size || 20} height={props.size || 20} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><circle cx="12" cy="8" r="4"/><path d="M20 20v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1"/></svg>
+);
+const MailIcon = (props) => (
+  <svg viewBox="0 0 24 24" width={props.size || 20} height={props.size || 20} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>
+);
+const LockIcon = (props) => (
+  <svg viewBox="0 0 24 24" width={props.size || 20} height={props.size || 20} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+);
+const EyeIcon = (props) => (
+  <svg viewBox="0 0 24 24" width={props.size || 20} height={props.size || 20} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+);
+const EyeOffIcon = (props) => (
+  <svg viewBox="0 0 24 24" width={props.size || 20} height={props.size || 20} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.81 21.81 0 0 1 5.06-6.06"/><path d="M1 1l22 22"/><path d="M9.53 9.53A3 3 0 0 0 12 15a3 3 0 0 0 2.47-5.47"/></svg>
+);
+const ArrowRightIcon = (props) => (
+  <svg viewBox="0 0 24 24" width={props.size || 20} height={props.size || 20} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+);
+const CheckCircleIcon = (props) => (
+  <svg viewBox="0 0 24 24" width={props.size || 20} height={props.size || 20} fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+);
 
 const Login = () => {
-  const [mode, setMode] = useState("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+  });
   const navigate = useNavigate();
   const { addToast } = useToast();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
@@ -42,7 +74,7 @@ const Login = () => {
   };
 
   const handleEmailLogin = async () => {
-    if (!email || !password) {
+    if (!formData.email || !formData.password) {
       addToast({
         type: 'error',
         title: 'Please enter both email and password.',
@@ -52,7 +84,7 @@ const Login = () => {
     }
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
       addToast({
         type: 'success',
         title: 'Login Successful',
@@ -71,7 +103,7 @@ const Login = () => {
   };
 
   const handleSignup = async () => {
-    if (!email || !password || !name) {
+    if (!formData.email || !formData.password || !formData.name) {
       addToast({
         type: 'error',
         title: 'Please fill all fields.',
@@ -79,7 +111,7 @@ const Login = () => {
       });
       return;
     }
-    if (password.length < 6) {
+    if (formData.password.length < 6) {
       addToast({
         type: 'error',
         title: 'Password must be at least 6 characters.',
@@ -89,7 +121,7 @@ const Login = () => {
     }
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       addToast({
         type: 'success',
         title: 'Account Created',
@@ -108,13 +140,13 @@ const Login = () => {
   };
 
   const handleResetPassword = async () => {
-    if (!email) return addToast({
+    if (!formData.email) return addToast({
       type: 'error',
       title: 'Enter email to reset',
       duration: 3500
     });
     try {
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordResetEmail(auth, formData.email);
       addToast({
         type: 'success',
         title: 'Reset email sent',
@@ -129,183 +161,194 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (mode === 'login') {
+    if (isLogin) {
       handleEmailLogin();
     } else {
       handleSignup();
     }
   };
 
-  return (
-    <div className="login-page">
-      <div className="login-container">
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-        {/* Main Content */}
-        <main className="login-main">
-          <div className="login-content">
-            {/* Left Side - Branding */}
-            <div className="login-branding">
-              <div className="brand-content">
-                <div className="brand-logo">
-                  <img src={loginIllustration} alt="DeskBuddy" />
-                </div>
-                <h2 className="brand-title">Welcome to DeskBuddy</h2>
-                <p className="brand-subtitle">
-                  Your comprehensive student management platform for seamless check-ins and verifications
-                </p>
-                <div className="brand-features">
-                  <div className="feature-item">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                      <polyline points="22,4 12,14.01 9,11.01"></polyline>
-                    </svg>
-                    <span>Quick student check-ins</span>
-                  </div>
-                  <div className="feature-item">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <polyline points="14,2 14,8 20,8"></polyline>
-                      <line x1="16" y1="13" x2="8" y2="13"></line>
-                      <line x1="16" y1="17" x2="8" y2="17"></line>
-                      <polyline points="10,9 9,9 8,9"></polyline>
-                    </svg>
-                    <span>Document verification</span>
-                  </div>
-                  <div className="feature-item">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                      <line x1="16" y1="2" x2="16" y2="6"></line>
-                      <line x1="8" y1="2" x2="8" y2="6"></line>
-                      <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                    <span>Real-time analytics</span>
-                  </div>
-                </div>
+  const handleToggle = (loginState) => {
+    setIsLogin(loginState);
+    setFormData({ email: "", password: "", name: "" });
+  };
+
+  if (!mounted) return null;
+
+  return (
+    <div className="login-container">
+      <div className="login-background">
+        <div className="animated-gradient"></div>
+        <div className="geometric-shapes">
+          <div className="shape-container shape-container-1">
+            <div className="geometric-shape triangle"></div>
+          </div>
+          <div className="shape-container shape-container-2">
+            <div className="geometric-shape square"></div>
+          </div>
+          <div className="shape-container shape-container-3">
+            <div className="geometric-shape circle"></div>
+          </div>
+          <div className="shape-container shape-container-4">
+            <div className="geometric-shape hexagon"></div>
+          </div>
+          <div className="shape-container shape-container-5">
+            <div className="geometric-shape diamond"></div>
+          </div>
+        </div>
+        <div className="gradient-orb orb-1"></div>
+        <div className="gradient-orb orb-2"></div>
+        <div className="gradient-orb orb-3"></div>
+        <div className="gradient-orb orb-4"></div>
+        <div className="floating-particles">
+          {[...Array(30)].map((_, i) => (
+            <div key={i} className={`particle particle-${i + 1}`}></div>
+          ))}
+        </div>
+        <div className="wave-animation">
+          <div className="wave wave-1"></div>
+          <div className="wave wave-2"></div>
+          <div className="wave wave-3"></div>
+        </div>
+      </div>
+      <div className="login-card">
+        <div className="login-header">
+          <div className="logo-container">
+            <div className="logo">
+              <div className="logo-inner">
+                <UserIcon className="logo-icon" size={28} />
               </div>
             </div>
-
-            {/* Right Side - Auth Form */}
-            <div className="login-form-container">
-              <div className="login-form-card">
-                <div className="form-header">
-                  <h2 className="form-title">{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
-                  <p className="form-subtitle">
-                    {mode === 'login' 
-                      ? 'Sign in to your account to continue' 
-                      : 'Create a new account to get started'
-                    }
-                  </p>
-                </div>
-
-                {/* Tab Navigation */}
-                <div className="auth-tabs">
-                  <button
-                    className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
-                    onClick={() => setMode('login')}
-                    type="button"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    className={`auth-tab ${mode === 'signup' ? 'active' : ''}`}
-                    onClick={() => setMode('signup')}
-                    type="button"
-                  >
-                    Sign Up
-                  </button>
-                </div>
-
-                <form className="auth-form" onSubmit={handleSubmit}>
-                  <div className="form-group" style={{ display: mode === 'signup' ? 'flex' : 'none' }}>
-                    <label className="form-label">Full Name</label>
-                    <input
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="form-input"
-                      autoFocus={mode === 'signup'}
-                      required={mode === 'signup'}
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label className="form-label">Email Address</label>
-                    <input
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="form-input"
-                      autoFocus={mode === 'login'}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label className="form-label">Password</label>
-                    <input
-                      type="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="form-input"
-                      required
-                    />
-                  </div>
-
-                  {mode === 'login' && (
-                    <div className="form-actions">
-                      <button 
-                        type="button" 
-                        className="forgot-password"
-                        onClick={handleResetPassword}
-                      >
-                        Forgot password?
-                      </button>
-                    </div>
-                  )}
-
-                  <button 
-                    type="submit" 
-                    className="login-submit"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className="spinner"></div>
-                        {mode === 'login' ? 'Signing In...' : 'Creating Account...'}
-                      </>
-                    ) : (
-                      mode === 'login' ? 'Sign In' : 'Create Account'
-                    )}
-                  </button>
-
-                  <div className="divider">
-                    <span>or</span>
-                  </div>
-
-                  <button 
-                    type="button" 
-                    className="google-btn"
-                    onClick={handleGoogleLogin}
-                    disabled={isLoading}
-                  >
-                    <svg className="google-icon" viewBox="0 0 24 24" width="20" height="20">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    Continue with Google
-                  </button>
-                </form>
-              </div>
+            <div className="brand-info">
+              <h1 className="brand-name">DeskBuddy</h1>
+              <p className="brand-tagline">Your Productivity Partner</p>
             </div>
           </div>
-        </main>
+          <div className="welcome-section">
+            <h2 className="welcome-title">{isLogin ? "Welcome back" : "Get started"}</h2>
+            <p className="welcome-text">
+              {isLogin
+                ? "Sign in to continue your productivity journey"
+                : "Create your account and boost your productivity"}
+            </p>
+          </div>
+        </div>
+        <div className="form-toggle">
+          <button className={`toggle-btn ${isLogin ? "active" : ""}`} onClick={() => handleToggle(true)}>
+            Sign In
+          </button>
+          <button className={`toggle-btn ${!isLogin ? "active" : ""}`} onClick={() => handleToggle(false)}>
+            Sign Up
+          </button>
+          <div className={`toggle-indicator ${isLogin ? "left" : "right"}`}></div>
+        </div>
+        <form onSubmit={handleSubmit} className="login-form">
+          {!isLogin && (
+            <div className="input-group name-field">
+              <label className="input-label">Full Name</label>
+              <div className="input-wrapper">
+                <UserIcon className="input-icon" />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Enter your full name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required={!isLogin}
+                />
+                <div className="input-border"></div>
+              </div>
+            </div>
+          )}
+          <div className="input-group email-field">
+            <label className="input-label">Email Address</label>
+            <div className="input-wrapper">
+              <MailIcon className="input-icon" />
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+              <div className="input-border"></div>
+            </div>
+          </div>
+          <div className="input-group password-field">
+            <label className="input-label">Password</label>
+            <div className="input-wrapper">
+              <LockIcon className="input-icon" />
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+              />
+              <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+              </button>
+              <div className="input-border"></div>
+            </div>
+          </div>
+          {isLogin && (
+            <div className="form-options">
+              <label className="checkbox-container">
+                <input type="checkbox" />
+                <span className="checkmark"></span>
+                <span className="checkbox-text">Keep me signed in</span>
+              </label>
+              <a href="#" className="forgot-password" onClick={handleResetPassword}>
+                Forgot Password?
+              </a>
+            </div>
+          )}
+          <button type="submit" className={`submit-btn${isSuccess ? " success" : ""}`} disabled={isLoading}>
+            {isSuccess ? (
+              <>
+                <CheckCircleIcon className="success-icon" />
+                Success!
+              </>
+            ) : isLoading ? (
+              <>
+                <div className="loading-spinner"></div>
+                <span>Processing...</span>
+              </>
+            ) : (
+              <>
+                <span>{isLogin ? "Sign In" : "Create Account"}</span>
+                <ArrowRightIcon className="submit-arrow" />
+              </>
+            )}
+          </button>
+        </form>
+        <div className="divider">
+          <span>or continue with</span>
+        </div>
+        <div className="social-login">
+          <button className="social-btn google" onClick={handleGoogleLogin}>
+            <div className="social-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+            </div>
+            <span>Continue with Google</span>
+          </button>
+        </div>
       </div>
     </div>
   );
