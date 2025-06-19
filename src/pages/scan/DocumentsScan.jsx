@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Html5QrScanner from "../../components/Html5QrScanner";
@@ -9,7 +9,6 @@ import "../../styles/Scanner.css";
 import Confetti from "../../components/Confetti";
 import ScanErrorAnimation from "../../components/ScanErrorAnimation";
 import { useToast } from "../../components/ToastProvider";
-import { toast } from "react-hot-toast";
 
 const DocumentsScan = () => {
   const navigate = useNavigate();
@@ -27,6 +26,7 @@ const DocumentsScan = () => {
   const [scanErrorTrigger, setScanErrorTrigger] = useState(false);
   const [showCheckmark, setShowCheckmark] = useState(false);
   const { addToast } = useToast();
+  const processingRef = useRef(false);
 
   // Capitalize each word in the name
   const capitalizeName = (name) =>
@@ -50,6 +50,8 @@ const DocumentsScan = () => {
   };
 
   const handleScanSuccess = async (rawData) => {
+    if (processingRef.current) return;
+    processingRef.current = true;
     try {
       // Prevent multiple rapid scans
       if (scanSuccess || isLoading) return;
@@ -73,13 +75,12 @@ const DocumentsScan = () => {
           
           if (!res.ok) {
             if (res.status === 409) {
-              toast.error(
-                <span style={{display:'flex',alignItems:'center',gap:'0.7rem'}}>
-                  <span style={{fontSize:'1.5rem'}}>⚠️</span>
-                  <span><b>Duplicate Scan:</b> This student has already been scanned for this stage.</span>
-                </span>,
-                { duration: 4000 }
-              );
+              addToast({
+                type: "error",
+                title: "Duplicate Scan",
+                message: "This student has already been scanned for this stage.",
+                duration: 4000
+              });
               setScanErrorTrigger(true);
               setScanSuccess(false);
               setIsLoading(false);
@@ -129,6 +130,8 @@ const DocumentsScan = () => {
       setScanSuccess(false);
       setIsLoading(false);
       setShowCheckmark(false);
+    } finally {
+      setTimeout(() => { processingRef.current = false; }, 1000); // allow next scan after 1s
     }
   };
 
@@ -143,6 +146,7 @@ const DocumentsScan = () => {
       setIsLoading(false);
       setShowScanNext(false);
     }
+    processingRef.current = false;
   };
 
   const handleScanNext = () => {

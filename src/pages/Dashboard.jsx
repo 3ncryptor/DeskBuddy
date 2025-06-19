@@ -63,7 +63,7 @@ const Dashboard = () => {
     },
     { 
       label: "Send QR to Student", 
-      route: "/send-qr", 
+      route: "/sendqr",
       color: "var(--warning-color)", 
       svg: ScanQR,
       description: "Generate and send QR codes to students"
