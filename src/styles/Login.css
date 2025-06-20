@@ -711,14 +711,14 @@
 
 .input-wrapper input {
   width: 100%;
-  padding: 18px 18px 18px 52px;
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
-  font-size: 16px;
-  background: white;
+  padding: var(--space-4) var(--space-4) var(--space-4) 52px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-base);
+  background: var(--bg-primary);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .input-wrapper input:focus {
@@ -870,23 +870,23 @@
 
 .submit-btn {
   width: 100%;
-  padding: 18px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  padding: var(--space-4);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: var(--text-inverse);
   border: none;
-  border-radius: 16px;
-  font-size: 16px;
-  font-weight: 700;
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
-  margin-top: 16px;
+  margin-top: var(--space-4);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  gap: var(--space-3);
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.13);
   animation: fadeInUp 2.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

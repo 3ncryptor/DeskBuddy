@@ -1,5 +1,5 @@
 .app {
-  min-height: 100vh;
+  height: 100vh;
   background: var(--bg-primary);
   transition: background 0.3s;
 }
@@ -7,7 +7,7 @@
   background: #1e293b;
 }
 .main-content {
-  min-height: 100vh;
+  height: 100vh;
   padding: 0;
   background: transparent;
   transition: background 0.3s, margin 0.3s;

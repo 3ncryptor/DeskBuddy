@@ -1,219 +1,66 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
 import Html5QrScanner from "../../components/Html5QrScanner";
 import StudentInfoCard from "../../components/StudentInfoCard";
 import ConfirmButton from "../../components/ConfirmButton";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import Confetti from "../../components/Confetti";
 import ScanErrorAnimation from "../../components/ScanErrorAnimation";
-import { useToast } from "../../components/ToastProvider";
-import "../../styles/Scanner.css";
+import { useScanHandler } from "../../components/useScanHandler";
+import Loader from '../../components/Loader';
 
 const ArrivalScan = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  const [scanning, setScanning] = useState(false);
-  const [cameraId, setCameraId] = useState("");
-  const [cameras, setCameras] = useState([]);
-  const [showCameraDropdown, setShowCameraDropdown] = useState(false);
-  const [studentId, setStudentId] = useState(null);
-  const [studentData, setStudentData] = useState(null);
-  const [scanSuccess, setScanSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showScanNext, setShowScanNext] = useState(false);
-  const { addToast } = useToast();
-  const [confettiTrigger, setConfettiTrigger] = useState(false);
-  const [scanErrorTrigger, setScanErrorTrigger] = useState(false);
-  const [showCheckmark, setShowCheckmark] = useState(false);
-  const processingRef = useRef(false);
-
-  // Capitalize each word in the name
-  const capitalizeName = (name) =>
-    name.replace(/\b\w/g, (c) => c.toUpperCase());
-
-  // Get display name for Google, fallback to email/password name or email
-  const getUserName = () => {
-    if (!user) return '';
-    if (user.displayName) return capitalizeName(user.displayName);
-    if (user.email) return capitalizeName(user.email.split('@')[0]);
-    return 'User';
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
-  const handleScanSuccess = async (rawData) => {
-    if (processingRef.current) return;
-    processingRef.current = true;
-    console.log("=== QR SCAN SUCCESS ===");
-    console.log("Raw QR data received:", rawData);
-    console.log("Current state - scanSuccess:", scanSuccess, "isLoading:", isLoading);
-    
-    try {
-      // Prevent multiple rapid scans
-      if (scanSuccess || isLoading) {
-        console.log("Scan blocked - already processing");
-        return;
-      }
-      
-      console.log("Parsing QR data...");
-      const parsed = JSON.parse(rawData);
-      console.log("Parsed data:", parsed);
-      
-      if (!parsed.studentId) {
-        console.log("No studentId found in QR data");
-        throw new Error("Invalid QR code format - missing studentId");
-      }
-      
-      console.log("Valid studentId found:", parsed.studentId);
-      
-      // Show success animation
-      setScanSuccess(true);
-      setIsLoading(true);
-      setConfettiTrigger(false);
-      setScanErrorTrigger(false);
-      setShowCheckmark(true);
-      console.log("Set loading states - scanSuccess: true, isLoading: true");
-      
-      // Show checkmark pulse for 600ms, then fetch student data
-      setTimeout(async () => {
-        setShowCheckmark(false);
-        console.log("Starting API call to fetch student data...");
-        try {
-          setStudentId(parsed.studentId);
-          const apiUrl = `/api/student/${parsed.studentId}`;
-          console.log("Making API call to:", apiUrl);
-          
-          const res = await fetch(apiUrl);
-          console.log("API response status:", res.status);
-          
-          if (!res.ok) {
-            if (res.status === 409) {
-              addToast({
-                type: "error",
-                title: "Duplicate Scan",
-                message: "This student has already been scanned for this stage.",
-                duration: 4000
-              });
-              setScanErrorTrigger(true);
-              setScanSuccess(false);
-              setIsLoading(false);
-              setShowCheckmark(false);
-              return;
-            } else if (res.status === 403) {
-              throw new Error("Student not found or access denied");
-            } else if (res.status === 404) {
-              throw new Error("Student not found in database");
-            } else {
-              throw new Error(`Server error: ${res.status}`);
-            }
-          }
-          
-          const result = await res.json();
-          console.log("Student data received:", result);
-          setStudentData(result);
-          setConfettiTrigger(true);
-          addToast({
-            type: "success",
-            title: "Student Found!",
-            message: `Student ID: ${parsed.studentId}`,
-            duration: 3000
-          });
-          
-        } catch (error) {
-          setScanErrorTrigger(true);
-          addToast({
-            type: "error",
-            title: "Error Fetching Student",
-            message: error.message,
-            duration: 3500
-          });
-        } finally {
-          setScanSuccess(false);
-          setIsLoading(false);
-          setShowCheckmark(false);
-          console.log("Reset loading states - scanSuccess: false, isLoading: false");
-        }
-      }, 600); // Checkmark pulse duration
-      
-    } catch (error) {
-      setScanErrorTrigger(true);
-      addToast({
-        type: "error",
-        title: "Invalid QR Code",
-        message: error.message,
-        duration: 3500
-      });
-      setScanSuccess(false);
-      setIsLoading(false);
-      setShowCheckmark(false);
-    } finally {
-      setTimeout(() => { processingRef.current = false; }, 1000); // allow next scan after 1s
-    }
-  };
+  const scan = useScanHandler();
+  const [showInfoOverlay, setShowInfoOverlay] = useState(false);
 
   const handleReset = (mode) => {
     if (mode === "refresh") {
-      // Only refresh the student card, don't reset everything
-      setShowScanNext(true);
-      // Optionally, re-fetch student data here if needed
+      scan.showScanNext = true;
     } else {
-      setStudentId(null);
-      setStudentData(null);
-      setScanning(false);
-      setScanSuccess(false);
-      setIsLoading(false);
-      setShowScanNext(false);
+      scan.studentId = null;
+      scan.studentData = null;
+      scan.scanning = false;
+      scan.scanSuccess = false;
+      scan.isLoading = false;
+      scan.showScanNext = false;
     }
-    processingRef.current = false;
+    scan.processingRef.current = false;
   };
 
   const handleScanNext = () => {
-    setStudentId(null);
-    setStudentData(null);
-    setScanning(false);
-    setScanSuccess(false);
-    setIsLoading(false);
-    setShowScanNext(false);
-  };
-
-  const handleCameraSelect = (cameraId) => {
-    setCameraId(cameraId);
-    setShowCameraDropdown(false);
-    // Stop scanning when camera changes
-    if (scanning) {
-      setScanning(false);
-    }
+    scan.studentId = null;
+    scan.studentData = null;
+    scan.scanning = false;
+    scan.scanSuccess = false;
+    scan.isLoading = false;
+    scan.showScanNext = false;
   };
 
   const handleScanToggle = () => {
-    setScanning((prev) => !prev);
-    setScanSuccess(false);
-    setIsLoading(false);
+    scan.setScanning(prev => !prev);
+    scan.setScanSuccess(false);
+    scan.setIsLoading(false);
   };
 
   const getCurrentCameraName = () => {
-    if (!cameraId) return "Select Camera";
-    const camera = cameras.find(cam => cam.id === cameraId);
+    if (!scan.cameraId) return "Select Camera";
+    const camera = scan.cameras.find(cam => cam.id === scan.cameraId);
     return camera ? camera.label || camera.id : "Select Camera";
   };
 
   const getButtonText = () => {
-    if (isLoading) return "Loading...";
-    if (scanning) return "Stop Scanning";
+    if (scan.isLoading) return "Loading...";
+    if (scan.scanning) return "Stop Scanning";
     return "Start Scanning";
   };
 
   const isButtonDisabled = () => {
-    return !cameraId || isLoading;
+    return !scan.cameraId || scan.isLoading;
   };
+
+  useEffect(() => {
+    if (scan.studentData && window.innerWidth <= 900) setShowInfoOverlay(true);
+    else setShowInfoOverlay(false);
+  }, [scan.studentData]);
 
   return (
     <div className="scanner-page">
@@ -231,52 +78,36 @@ const ArrivalScan = () => {
                 Back to Arrival
               </button>
               <div className="page-info">
-                <h1 className="page-title">Arrival QR Scanner</h1>
+                <h1 className="page-title">Arrival Verification Scanner</h1>
                 <p className="page-description">
-                  Scan student QR codes to process arrivals and check-ins
+                  Scan student QR codes to verify arrival
                 </p>
               </div>
-            </div>
-            <div className="header-actions">
-              <div className="user-info">
-                <div className="user-details">
-                  <span className="user-name">{getUserName()}</span>
-                  <span className="user-role">Administrator</span>
-                </div>
-              </div>
-              <button className="btn btn-secondary logout-btn" onClick={handleLogout}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16,17 21,12 16,7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                Sign Out
-              </button>
             </div>
           </div>
         </header>
 
         <main className="scanner-main">
-          <div className="scanner-flex-layout">
-            <div className="scanner-left">
-              <div className="scanner-container">
-                <div className="camera-dropdown-container">
+          <div className="scanner-flex-layout" style={window.innerWidth <= 900 ? {flexDirection: 'column', alignItems: 'center', gap: 0, marginLeft: 0, width: '100vw', minHeight: '100vh', justifyContent: 'flex-start'} : {flex: 1, alignItems: 'flex-start', justifyContent: 'flex-start', gap: '3rem', marginLeft: '-2rem'}}>
+            <div className="scanner-left" style={window.innerWidth <= 900 ? {width: '100vw', minWidth: 0, maxWidth: '100vw', padding: '1.2rem 0.5rem 0.5rem 0.5rem', height: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start'} : {flex: 1, maxWidth: 540, minWidth: 380, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+              <div className="scanner-container" style={window.innerWidth <= 900 ? {width: '100vw', height: 'auto', padding: 0, margin: 0, background: '#eaf1fb', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start'} : {}}>
+                <div className="camera-dropdown-container" style={window.innerWidth <= 900 ? {width: '100%', marginBottom: 12} : {}}>
                   <button 
                     className="camera-dropdown-btn"
-                    onClick={() => setShowCameraDropdown(!showCameraDropdown)}
-                    disabled={isLoading}
+                    onClick={() => scan.setShowCameraDropdown(!scan.showCameraDropdown)}
+                    disabled={scan.isLoading}
                   >
                     <span className="camera-icon">📹</span>
                     <span className="camera-text">{getCurrentCameraName()}</span>
-                    <span className={`dropdown-arrow ${showCameraDropdown ? 'rotated' : ''}`}>▼</span>
+                    <span className={`dropdown-arrow ${scan.showCameraDropdown ? 'rotated' : ''}`}>▼</span>
                   </button>
-                  {showCameraDropdown && (
+                  {scan.showCameraDropdown && (
                     <div className="camera-dropdown-menu">
-                      {cameras.map((cam) => (
+                      {scan.cameras.map((cam) => (
                         <button
                           key={cam.id}
-                          className={`camera-option ${cameraId === cam.id ? 'selected' : ''}`}
-                          onClick={() => handleCameraSelect(cam.id)}
+                          className={`camera-option ${scan.cameraId === cam.id ? 'selected' : ''}`}
+                          onClick={() => scan.handleCameraSelect(cam.id)}
                         >
                           {cam.label || cam.id}
                         </button>
@@ -284,16 +115,16 @@ const ArrivalScan = () => {
                     </div>
                   )}
                 </div>
-                <div className={`scanner-box ${scanning ? 'scanning' : ''} ${scanSuccess ? 'scan-success' : ''} ${isLoading ? 'loading' : ''}`}>
+                <div className={`scanner-box ${scan.scanning ? 'scanning' : ''} ${scan.scanSuccess ? 'scan-success' : ''} ${scan.isLoading ? 'loading' : ''}`} style={window.innerWidth <= 900 ? {width: 320, height: 320, maxWidth: '95vw', maxHeight: 320, borderRadius: 16, padding: 0, margin: '0 auto', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'} : {}}>
                   <Html5QrScanner
-                    onScanSuccess={handleScanSuccess}
-                    cameraId={cameraId}
-                    scanning={scanning}
-                    onCameras={setCameras}
+                    onScanSuccess={scan.handleScanSuccess}
+                    cameraId={scan.cameraId}
+                    scanning={scan.scanning}
+                    onCameras={scan.setCameras}
                   />
-                  {scanning && <div className="laser-line"></div>}
-                  {scanSuccess && <div className="scan-pulse"></div>}
-                  {showCheckmark && (
+                  {scan.scanning && <div className="laser-line"></div>}
+                  {scan.scanSuccess && <div className="scan-pulse"></div>}
+                  {scan.showCheckmark && (
                     <div className="checkmark-pulse-overlay">
                       <div className="checkmark-circle">
                         <svg width="64" height="64" viewBox="0 0 64 64">
@@ -304,42 +135,54 @@ const ArrivalScan = () => {
                       </div>
                     </div>
                   )}
-                  {isLoading && (
-                    <div className="loading-overlay premium">
-                      <LoadingSpinner message="Fetching student details..." />
-                    </div>
-                  )}
-                  <Confetti trigger={confettiTrigger} />
-                  <ScanErrorAnimation trigger={scanErrorTrigger} />
+                  {scan.isLoading && <Loader />}
+                  <ScanErrorAnimation trigger={scan.scanErrorTrigger} />
                 </div>
+                <div className="scanner-controls" style={window.innerWidth <= 900 ? {width: '100%', marginTop: 18, display: 'flex', justifyContent: 'center'} : {}}>
+                  <button 
+                    className={`scanner-action-btn ${isButtonDisabled() ? 'disabled' : ''}`} 
+                    onClick={handleScanToggle}
+                    disabled={isButtonDisabled()}
+                  >
+                    {getButtonText()}
+                  </button>
+                </div>
+                {!scan.cameraId && window.innerWidth <= 900 && (
+                  <p className="scanner-hint" style={{marginTop: 10}}>Please select a camera first</p>
+                )}
               </div>
-              <div className="scanner-controls">
-              <button 
-                className={`scanner-action-btn ${isButtonDisabled() ? 'disabled' : ''}`} 
-                onClick={handleScanToggle}
-                disabled={isButtonDisabled()}
-              >
-                {getButtonText()}
-              </button>
-              </div>
-              {!cameraId && (
-                <p className="scanner-hint">Please select a camera first</p>
-              )}
             </div>
-            <div className="scanner-right">
-              {studentData && (
-                <>
-                  <StudentInfoCard student={studentData} currentStage="arrival" />
+            {window.innerWidth > 900 && (
+              <div className="scanner-right" style={{flex: 1, maxWidth: 480, minWidth: 340, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', marginTop: '1.5rem'}}>
+                {scan.studentData && (
+                  <>
+                    <StudentInfoCard student={scan.studentData} currentStage="arrival" />
+                    <ConfirmButton
+                      studentId={scan.studentId}
+                      stage="arrival"
+                      onReset={handleReset}
+                      showScanNext={scan.showScanNext}
+                      onScanNext={handleScanNext}
+                    />
+                  </>
+                )}
+              </div>
+            )}
+            {window.innerWidth <= 900 && showInfoOverlay && (
+              <div className="scanner-info-overlay">
+                <button className="scanner-info-close" onClick={() => setShowInfoOverlay(false)} aria-label="Close Info Card">×</button>
+                <div className="scanner-info-card-wrapper">
+                  <StudentInfoCard student={scan.studentData} currentStage="arrival" />
                   <ConfirmButton
-                    studentId={studentId}
+                    studentId={scan.studentId}
                     stage="arrival"
                     onReset={handleReset}
-                    showScanNext={showScanNext}
+                    showScanNext={scan.showScanNext}
                     onScanNext={handleScanNext}
                   />
-                </>
-              )}
-            </div>
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>

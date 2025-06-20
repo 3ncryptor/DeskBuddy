@@ -14,8 +14,10 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { useAuth } from "./context/AuthContext";
 import PageTransition from "./components/PageTransition";
-import Sidebar from "./components/Sidebar";
+import NewSidebar from './components/NewSidebar';
 import React, { useState } from "react";
+import SplashPreloader from './components/SplashPreloader';
+import { FiMenu } from 'react-icons/fi';
 
 // Component to handle automatic redirection for authenticated users
 const AuthRedirect = ({ children }) => {
@@ -23,14 +25,21 @@ const AuthRedirect = ({ children }) => {
   return user ? <Navigate to="/dashboard" replace /> : children;
 };
 
-function AppLayout({ children, theme, onToggleTheme }) {
+function AppLayout({ children, theme }) {
   const location = useLocation();
-  // Hide sidebar on login page
   const hideSidebar = location.pathname === "/";
+  const handleCollapseChange = React.useCallback(() => {}, []);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
+  const marginLeft = !hideSidebar ? 64 : 0;
+  // Detect mobile
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches;
   return (
     <div className={theme === 'dark' ? 'app dark' : 'app'}>
-      {!hideSidebar && <Sidebar theme={theme} onToggleTheme={onToggleTheme} />}
-      <div className="main-content" style={{ marginLeft: (window.innerWidth > 900 && !hideSidebar) ? 250 : 0, transition: 'margin 0.3s' }}>
+      {/* Sidebar only on desktop/tablet, no hamburger */}
+      {!hideSidebar && !isMobile && (
+        <NewSidebar onCollapseChange={handleCollapseChange} mobileOpen={mobileSidebarOpen} setMobileOpen={setMobileSidebarOpen} />
+      )}
+      <div className="main-content" style={{ marginLeft: !isMobile && !hideSidebar ? marginLeft : 0, width: '100%' }}>
         {children}
       </div>
     </div>
@@ -38,12 +47,20 @@ function AppLayout({ children, theme, onToggleTheme }) {
 }
 
 function App() {
-  const [theme, setTheme] = useState('light');
-  const handleToggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
+  const [theme] = useState('light');
+  const [showSplash, setShowSplash] = React.useState(true);
+
+  React.useEffect(() => {
+    // Show splash for at least one full animation cycle (4s)
+    const timeout = setTimeout(() => setShowSplash(false), 3500); // 4s for full animation
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
     <AuthProvider>
+      {showSplash && <SplashPreloader />}
       <BrowserRouter>
-        <AppLayout theme={theme} onToggleTheme={handleToggleTheme}>
+        <AppLayout theme={theme}>
           <PageTransition>
             <Routes>
               <Route 

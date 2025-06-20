@@ -8,7 +8,7 @@ import HostelScanPNG from '../assets/HostelScan.png';
 import ScanQR from '../assets/scanQR.svg';
 import logo from '../assets/Login.svg';
 
-const ADMIN_USERS = ['piyush', 'aryan'];
+const ADMIN_USERS = ['aryan vibhuti', 'piyush', 'piyush yadav', 'aryan'];
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -21,8 +21,6 @@ const Dashboard = () => {
     return '';
   };
   const userName = getUserName();
-  const isAdmin = ADMIN_USERS.includes(userName.toLowerCase());
-  const role = isAdmin ? 'Administrator' : 'Volunteer';
 
   const cards = [
     { 

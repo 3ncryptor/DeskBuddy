@@ -1,11 +1,16 @@
+html, body {
+  overflow-x: hidden;
+}
+
 .scanner-page {
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   background: linear-gradient(135deg, #e0e7ef 0%, #cfd9e9 100%);
   display: flex;
   flex-direction: column;
   padding: 0;
   text-align: left;
+  overflow-x: hidden;
 }
 
 .scanner-container {
@@ -13,9 +18,6 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 2rem;
 }
 
 .scanner-header {
@@ -30,9 +32,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 2rem;
+  width: 100%;
 }
 
 .header-left {
@@ -89,6 +89,7 @@
   align-items: center;
   justify-content: center;
   padding: 0;
+  width: 100%;
 }
 
 .scanner-box {
@@ -354,9 +355,80 @@
 
 @media (max-width: 900px) {
   .scanner-container {
-    padding: 0 1rem;
+    margin-left: 0 !important;
+    width: 100vw;
+    height: auto;
+    padding: 0 !important;
+    background: #eaf1fb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
   }
-  
+  .scanner-box {
+    width: 320px !important;
+    height: 320px !important;
+    max-width: 95vw !important;
+    max-height: 320px !important;
+    border-radius: 16px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #fff !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .scanner-flex-layout {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0 !important;
+    margin-left: 0 !important;
+    width: 100vw !important;
+    min-height: 100vh !important;
+    justify-content: flex-start !important;
+  }
+  .scanner-info-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding: 2.5rem 0.5rem 1.5rem 0.5rem;
+    animation: fadeInOverlay 0.3s;
+  }
+  .scanner-info-card-wrapper {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    background: none;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+  }
+  .scanner-info-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2.2rem;
+    z-index: 10000;
+    cursor: pointer;
+    padding: 0.2em 0.5em;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.18);
+    transition: background 0.2s;
+  }
+  .scanner-info-close:hover {
+    background: rgba(0,0,0,0.32);
+  }
   .header-content {
     padding: 0 1rem;
   }
@@ -385,12 +457,6 @@
     min-width: 100%;
     max-width: 100%;
     padding: 1rem;
-  }
-  
-  .scanner-box {
-    width: 100%;
-    max-width: 400px;
-    height: 350px;
   }
   
   .scanner-box video,
@@ -471,7 +537,7 @@
   align-items: center;
   justify-content: center;
   width: 100vw;
-  min-height: 100vh;
+  flex: 1;
   background: linear-gradient(135deg, #e0e7ef 0%, #cfd9e9 100%);
   padding: 0;
   gap: 6rem;
@@ -834,5 +900,10 @@
 .app.dark .scanner-action-btn:hover:not(.disabled) {
   background: linear-gradient(90deg, #a5b4fc 60%, #818cf8 100%);
   box-shadow: 0 4px 16px 0 #818cf822;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
   

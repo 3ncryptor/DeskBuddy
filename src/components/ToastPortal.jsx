@@ -35,7 +35,7 @@ const ToastPortal = ({ toasts, removeToast }) => {
             <div className="toast-title">{toast.title}</div>
             {toast.message && <div className="toast-message">{toast.message}</div>}
           </div>
-          <button className="toast-close" onClick={() => removeToast(toast.id)}>&times;</button>
+          <button className="toast-close" aria-label="Close notification" onClick={() => removeToast(toast.id)}>&times;</button>
           <div
             className="toast__progress"
             style={{

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/SendQR.css";
 import scanQR from "../assets/scanQR.svg";
 import { useToast } from '../components/ToastProvider';
+import SendQRLoader from '../components/SendQRLoader';
 
 const SendQR = () => {
   const navigate = useNavigate();
@@ -145,10 +145,11 @@ const SendQR = () => {
       setFileName("");
       setUploadedFile(null);
       
-    } catch (error) {
+    } catch {
       addToast({
         type: 'error',
-        title: `Failed to send emails: ${error.message}`,
+        title: 'Failed to send emails',
+        message: 'There was a problem sending emails. Please try again or contact support.',
         duration: 5000
       });
     } finally {
@@ -177,6 +178,7 @@ const SendQR = () => {
 
   return (
     <div className="sendqr-page">
+      {isLoading && <SendQRLoader />}
       <div className="sendqr-container">
         {/* Header Section */}
         <header className="sendqr-header-section">
@@ -222,11 +224,6 @@ const SendQR = () => {
 
         {/* Main Content */}
         <main className="sendqr-main">
-          {isLoading && (
-            <div className="loading-overlay">
-              <LoadingSpinner message="Sending QR codes to students..." />
-            </div>
-          )}
           <div className="sendqr-content premium-glass">
             <div className="sheen"></div>
             <div className="sendqr-header" style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
