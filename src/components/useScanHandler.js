@@ -16,6 +16,7 @@ export function useScanHandler() {
   const { addToast } = useToast();
   const processingRef = useRef(false);
   const isMounted = useRef(true);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     isMounted.current = true;
@@ -46,7 +47,7 @@ export function useScanHandler() {
         if (isMounted.current) setShowCheckmark(false);
         try {
           if (isMounted.current) setStudentId(parsed.studentId);
-          const res = await fetch(`/api/student/${parsed.studentId}`);
+          const res = await fetch(`${API_BASE_URL}/api/student/${parsed.studentId}`);
           if (!res.ok) {
             if (res.status === 409) {
               addToast({

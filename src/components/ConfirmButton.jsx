@@ -6,10 +6,11 @@ const ConfirmButton = ({ studentId, stage, onReset }) => {
   const { user } = useAuth();
   const volunteerName = user?.displayName || "Anonymous";
   const { addToast } = useToast();
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const handleConfirm = async () => {
     try {
-      const res = await fetch(`/api/scan/${stage}`, {
+      const res = await fetch(`${API_BASE_URL}/api/scan/${stage}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentId, volunteerName }),

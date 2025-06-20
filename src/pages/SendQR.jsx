@@ -14,6 +14,7 @@ const SendQR = () => {
   const [fileName, setFileName] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
   const { addToast } = useToast();
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   // Capitalize each word in the name
   const capitalizeName = (name) =>
@@ -119,7 +120,7 @@ const SendQR = () => {
       const formData = new FormData();
       formData.append('csvFile', uploadedFile);
 
-      const res = await fetch("http://localhost:3001/api/email/upload-csv", {
+      const res = await fetch(`${API_BASE_URL}/api/email/upload-csv`, {
         method: "POST",
         body: formData,
       });
