@@ -17,14 +17,16 @@ const VideoBackground = ({ videoUrl = DEMO_VIDEO }) => {
       <video
         ref={videoRef}
         className="bg-video"
-        src={videoUrl}
         autoPlay
         loop
         muted
         playsInline
         aria-hidden="true"
         tabIndex={-1}
-      />
+      >
+        <source src="https://github.com/3ncryptor/DeskBuddy/releases/download/login-video/LOGIN.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
       <div className="bg-overlay" />
     </StyledBg>
   );
