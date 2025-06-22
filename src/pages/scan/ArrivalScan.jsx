@@ -9,7 +9,7 @@ import Loader from '../../components/Loader';
 
 const ArrivalScan = () => {
   const navigate = useNavigate();
-  const scan = useScanHandler();
+  const scan = useScanHandler('Arrival');
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
 
   const handleReset = (mode) => {

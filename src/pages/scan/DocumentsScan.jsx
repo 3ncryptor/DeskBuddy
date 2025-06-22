@@ -9,7 +9,7 @@ import Loader from '../../components/Loader';
 
 const DocumentsScan = () => {
   const navigate = useNavigate();
-  const scan = useScanHandler();
+  const scan = useScanHandler('Documents');
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
 
   const handleReset = (mode) => {

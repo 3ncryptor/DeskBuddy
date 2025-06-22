@@ -10,6 +10,7 @@ import HostelScan from "./pages/scan/HostelScan";
 import DocumentsScan from "./pages/scan/DocumentsScan";
 import KitScan from "./pages/scan/KitScan";
 import SendQR from "./pages/SendQR";
+import Analytics from "./pages/Analytics";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { useAuth } from "./context/AuthContext";
@@ -18,6 +19,7 @@ import NewSidebar from './components/NewSidebar';
 import React, { useState } from "react";
 import SplashPreloader from './components/SplashPreloader';
 import { FiMenu } from 'react-icons/fi';
+import { AnalyticsProvider } from "./context/AnalyticsContext";
 
 // Component to handle automatic redirection for authenticated users
 const AuthRedirect = ({ children }) => {
@@ -58,6 +60,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <AnalyticsProvider>
       {showSplash && <SplashPreloader />}
       <BrowserRouter>
         <AppLayout theme={theme}>
@@ -158,6 +161,16 @@ function App() {
                 }
               />
 
+                {/* Analytics Page */}
+                <Route
+                  path="/analytics"
+                  element={
+                    <ProtectedRoute>
+                      <Analytics />
+                    </ProtectedRoute>
+                  }
+                />
+
               {/* Catch all route - redirect to dashboard if authenticated, otherwise to login */}
               <Route
                 path="*"
@@ -171,6 +184,7 @@ function App() {
           </PageTransition>
         </AppLayout>
       </BrowserRouter>
+      </AnalyticsProvider>
     </AuthProvider>
   );
 }

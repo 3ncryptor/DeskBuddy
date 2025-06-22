@@ -10,7 +10,7 @@ import Loader from '../../components/Loader';
 
 const HostelScan = () => {
   const navigate = useNavigate();
-  const scan = useScanHandler();
+  const scan = useScanHandler('Hostel');
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
 
   const handleReset = (mode) => {

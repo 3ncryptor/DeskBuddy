@@ -1,7 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useToast } from './ToastProvider';
+import { useAnalytics } from '../context/AnalyticsContext';
+import { useAuth } from '../context/AuthContext';
 
-export function useScanHandler() {
+export function useScanHandler(stage = 'Unknown') {
   const [scanning, setScanning] = useState(false);
   const [cameraId, setCameraId] = useState("");
   const [cameras, setCameras] = useState([]);
@@ -14,6 +16,8 @@ export function useScanHandler() {
   const [scanErrorTrigger, setScanErrorTrigger] = useState(false);
   const [showCheckmark, setShowCheckmark] = useState(false);
   const { addToast } = useToast();
+  const { addLog } = useAnalytics();
+  const { user } = useAuth();
   const processingRef = useRef(false);
   const isMounted = useRef(true);
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -61,6 +65,18 @@ export function useScanHandler() {
                 setScanSuccess(false);
                 setIsLoading(false);
                 setShowCheckmark(false);
+                
+                // Save duplicate scan analytics data
+                addLog({
+                  studentId: parsed.studentId,
+                  studentName: 'Unknown',
+                  stage: stage,
+                  volunteerName: user?.displayName || user?.email?.split('@')[0] || 'Unknown',
+                  timestamp: new Date().toISOString(),
+                  action: "scanned",
+                  result: "duplicate",
+                  error: "Student already scanned for this stage"
+                });
               }
               return;
             } else if (res.status === 403) {
@@ -80,6 +96,18 @@ export function useScanHandler() {
               message: `Student ID: ${parsed.studentId}`,
               duration: 3000
             });
+            
+            // Save detailed analytics data
+            addLog({
+              studentId: parsed.studentId,
+              studentName: result.name || result.studentName || 'Unknown',
+              stage: stage,
+              volunteerName: user?.displayName || user?.email?.split('@')[0] || 'Unknown',
+              timestamp: new Date().toISOString(),
+              action: "scanned",
+              result: "success",
+              studentData: result
+            });
           }
         } catch (error) {
           if (isMounted.current) {
@@ -93,6 +121,18 @@ export function useScanHandler() {
             setScanSuccess(false);
             setIsLoading(false);
             setShowCheckmark(false);
+            
+            // Save error analytics data
+            addLog({
+              studentId: parsed.studentId,
+              studentName: 'Unknown',
+              stage: stage,
+              volunteerName: user?.displayName || user?.email?.split('@')[0] || 'Unknown',
+              timestamp: new Date().toISOString(),
+              action: "scanned",
+              result: "error",
+              error: error.message
+            });
           }
         } finally {
           if (isMounted.current) {
@@ -113,11 +153,23 @@ export function useScanHandler() {
         setScanSuccess(false);
         setIsLoading(false);
         setShowCheckmark(false);
+        
+        // Save invalid QR code analytics data
+        addLog({
+          studentId: null,
+          studentName: 'Unknown',
+          stage: stage,
+          volunteerName: user?.displayName || user?.email?.split('@')[0] || 'Unknown',
+          timestamp: new Date().toISOString(),
+          action: "scanned",
+          result: "error",
+          error: error.message
+        });
       }
     } finally {
       setTimeout(() => { processingRef.current = false; }, 1000);
     }
-  }, [scanSuccess, isLoading, addToast]);
+  }, [scanSuccess, isLoading, addToast, addLog, stage, user?.displayName, user?.email]);
 
   const handleReset = useCallback((mode) => {
     if (mode === "refresh") {

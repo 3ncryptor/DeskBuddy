@@ -14,6 +14,7 @@ const navLinks = [
   { to: '/documents', label: 'Documents', icon: <FiFileText /> },
   { to: '/kit', label: 'Kit', icon: <MdInventory2 /> },
   { to: '/sendqr', label: 'Send QR', icon: <FiSend /> },
+  { to: '/analytics', label: 'Analytics', icon: <MdAssignment /> },
 ];
 
 export default function NewSidebar({ onCollapseChange, mobileOpen, setMobileOpen }) {

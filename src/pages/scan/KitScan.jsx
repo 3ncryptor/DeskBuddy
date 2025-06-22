@@ -10,7 +10,7 @@ import Loader from '../../components/Loader';
 
 const KitScan = () => {
   const navigate = useNavigate();
-  const scan = useScanHandler();
+  const scan = useScanHandler('Kit');
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
 
   const handleReset = (mode) => {
