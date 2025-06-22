@@ -163,6 +163,7 @@ const ArrivalScan = () => {
                       onReset={handleReset}
                       showScanNext={scan.showScanNext}
                       onScanNext={handleScanNext}
+                      studentData={scan.studentData}
                     />
                   </>
                 )}
@@ -179,6 +180,7 @@ const ArrivalScan = () => {
                     onReset={handleReset}
                     showScanNext={scan.showScanNext}
                     onScanNext={handleScanNext}
+                    studentData={scan.studentData}
                   />
                 </div>
               </div>

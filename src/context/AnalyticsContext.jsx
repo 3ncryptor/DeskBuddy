@@ -31,7 +31,7 @@ export function AnalyticsProvider({ children }) {
   // Save to localStorage on change
   useEffect(() => {
     if (!loading) {
-      localStorage.setItem(ANALYTICS_STORAGE_KEY, JSON.stringify(logs));
+    localStorage.setItem(ANALYTICS_STORAGE_KEY, JSON.stringify(logs));
     }
   }, [logs, loading]);
 

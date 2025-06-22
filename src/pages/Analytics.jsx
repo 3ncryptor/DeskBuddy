@@ -86,7 +86,7 @@ const Analytics = () => {
     
     // Unique volunteers: count unique volunteer names
     const uniqueVolunteers = new Set(logs.map(log => log.volunteerName).filter(Boolean)).size;
-
+    
     return {
       totalScans,
       uniqueStudents,
@@ -102,12 +102,12 @@ const Analytics = () => {
     if (filters.stage) {
       filtered = filtered.filter(log => log.stage === filters.stage);
     }
-
+    
     // Filter by volunteer
     if (filters.volunteer) {
       filtered = filtered.filter(log => log.volunteerName === filters.volunteer);
     }
-
+    
     // Filter by date range
     if (filters.dateRange) {
       const now = new Date();
@@ -312,7 +312,7 @@ const Analytics = () => {
         <>
           {/* Filters */}
           <div className="filters-card">
-            <AdvancedFilter
+      <AdvancedFilter
               searchTerm={filters.searchTerm}
               onSearchChange={(value) => setFilters(prev => ({ ...prev, searchTerm: value }))}
               selectedStage={filters.stage || 'all'}
@@ -329,7 +329,7 @@ const Analytics = () => {
             <div className="chart-header">
               <h3>Analytics Overview</h3>
               <p>Visual insights into scan patterns and volunteer performance</p>
-            </div>
+        </div>
             
             <div className="charts-grid">
               <ChartCard title="Scans by Stage" icon="📋">
@@ -349,8 +349,8 @@ const Analytics = () => {
                   <ScansOverTimeChart data={filteredLogs} />
                 </div>
               </ChartCard>
-              
-              <ChartCard 
+        
+        <ChartCard
                 title="Peak Hours Analysis" 
                 icon="⏰"
                 subtitle={`Last ${timeFrame === '24h' ? '24 hours' : timeFrame === '7d' ? '7 days' : '30 days'}`}
@@ -377,18 +377,18 @@ const Analytics = () => {
                 </div>
               </ChartCard>
             </div>
-          </div>
+      </div>
 
-          {/* Data Table */}
+      {/* Data Table */}
           <div className="data-table-container">
-            <DataTable 
+        <DataTable 
               data={filteredLogs} 
               searchTerm={filters.searchTerm}
               onSearchChange={(value) => setFilters(prev => ({ ...prev, searchTerm: value }))}
               showAllData={viewAll}
               onShowAllDataChange={setViewAll}
-            />
-          </div>
+        />
+      </div>
         </>
       )}
     </div>

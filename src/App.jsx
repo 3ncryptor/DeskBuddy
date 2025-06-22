@@ -166,7 +166,7 @@ function App() {
                   path="/analytics"
                   element={
                     <ProtectedRoute>
-                      <Analytics />
+                        <Analytics />
                     </ProtectedRoute>
                   }
                 />

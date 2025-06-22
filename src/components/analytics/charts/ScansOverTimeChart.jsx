@@ -26,8 +26,8 @@ const ScansOverTimeChart = ({ data }) => {
     const timeData = {};
     data.forEach(log => {
       try {
-        const date = new Date(log.timestamp).toLocaleDateString();
-        timeData[date] = (timeData[date] || 0) + 1;
+      const date = new Date(log.timestamp).toLocaleDateString();
+      timeData[date] = (timeData[date] || 0) + 1;
       } catch {
         console.error('Invalid timestamp:', log.timestamp);
       }
@@ -141,8 +141,8 @@ const ScansOverTimeChart = ({ data }) => {
     const timeData = {};
     data.forEach(log => {
       try {
-        const date = new Date(log.timestamp).toLocaleDateString();
-        timeData[date] = (timeData[date] || 0) + 1;
+      const date = new Date(log.timestamp).toLocaleDateString();
+      timeData[date] = (timeData[date] || 0) + 1;
       } catch {
         console.error('Invalid timestamp:', log.timestamp);
       }

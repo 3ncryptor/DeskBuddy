@@ -1076,119 +1076,119 @@
   .analytics-page {
     padding: 1rem;
   }
-
+  
   .dashboard-glass-header {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
   }
-
+  
   .summary-cards-container {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-
+  
   .dashboard-header-title {
     font-size: 1.25rem;
   }
-
+  
   .dashboard-header-welcome {
     font-size: 0.8rem;
   }
-
+  
   .summary-card {
     padding: 1.5rem;
   }
-
+  
   .card-content {
     gap: 0.75rem;
   }
-
+  
   .card-icon {
     font-size: 1.5rem;
   }
-
+  
   .summary-value {
     font-size: 1.5rem;
   }
-
+  
   .filters-card {
     padding: 1.5rem;
   }
-
+  
   .chart-display-card {
     min-height: 500px;
   }
-
+  
   .charts-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
     padding: 0 1.5rem 1.5rem 1.5rem;
   }
-
+  
   .chart-card {
     padding: 1.5rem;
   }
-
+  
   .chart-header {
     flex-direction: column;
     gap: 1rem;
   }
-
+  
   .chart-container {
     min-height: 350px;
   }
-
+  
   .data-table-container {
     margin: 0 -1rem;
     border-radius: 0;
   }
-
+  
   .table-search {
     padding: 1rem;
   }
-
+  
   .data-table th,
   .data-table td {
     padding: 0.75rem 0.5rem;
     font-size: 0.8rem;
   }
-
+  
   .stage-chip,
   .volunteer-chip {
     font-size: 0.7rem;
     padding: 0.2rem 0.5rem;
   }
-
+  
   .info-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-
+  
   .student-info-card {
     padding: 1rem;
     margin: 0.5rem;
   }
-
+  
   .export-button {
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
   }
-
+  
   .export-dropdown {
     right: -1rem;
     min-width: 180px;
   }
-
+  
   .export-option {
     padding: 0.75rem;
     font-size: 0.8rem;
   }
-
+  
   .option-content span {
     font-size: 0.8rem;
   }
-
+  
   .option-content small {
     font-size: 0.7rem;
   }
@@ -1198,41 +1198,41 @@
   .analytics-page {
     padding: 0.5rem;
   }
-
+  
   .dashboard-glass-header {
     padding: 1rem;
     margin-bottom: 1rem;
   }
-
+  
   .dashboard-header-logo {
     width: 32px;
     height: 32px;
   }
-
+  
   .dashboard-header-title {
     font-size: 1.1rem;
   }
-
+  
   .dashboard-header-welcome {
     font-size: 0.75rem;
   }
-
+  
   .summary-cards-container {
     gap: 0.75rem;
   }
-
+  
   .summary-card {
     padding: 1rem;
   }
-
+  
   .card-icon {
     font-size: 1.25rem;
   }
-
+  
   .summary-value {
     font-size: 1.25rem;
   }
-
+  
   .card-title {
     font-size: 0.8rem;
   }
@@ -1240,83 +1240,83 @@
   .filters-card {
     padding: 1rem;
   }
-
+  
   .chart-selection-section {
     margin-bottom: 1.5rem;
   }
-
+  
   .chart-select {
     font-size: 0.8rem;
   }
-
+  
   .chart-display-card {
     min-height: 350px;
   }
-
+  
   .chart-card {
     padding: 1rem;
   }
-
+  
   .chart-title {
     font-size: 1.1rem;
   }
-
+  
   .chart-content {
     min-height: 250px;
   }
-
+  
   .chart-container {
     min-height: 250px;
   }
-
+  
   .data-table-container {
     margin: 0 -0.5rem;
   }
-
+  
   .table-search {
     padding: 0.75rem;
   }
-
+  
   .table-search-input {
     font-size: 0.8rem;
   }
-
+  
   .search-wrapper svg {
     width: 16px;
     height: 16px;
   }
-
+  
   .data-table th,
   .data-table td {
     padding: 0.5rem 0.25rem;
     font-size: 0.75rem;
   }
-
+  
   .expand-button {
     padding: 0.25rem;
   }
-
+  
   .expand-icon {
     font-size: 1rem;
   }
-
+  
   .expanded-content {
     padding: 1rem;
   }
-
+  
   .student-info-card {
     padding: 0.75rem;
     margin: 0.25rem;
   }
-
+  
   .student-info-card h4 {
     font-size: 1rem;
   }
-
+  
   .info-item label {
     font-size: 0.7rem;
   }
-
+  
   .info-item span {
     font-size: 0.8rem;
   }
