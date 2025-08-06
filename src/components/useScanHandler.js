@@ -51,43 +51,37 @@ export function useScanHandler(stage = 'Unknown') {
         if (isMounted.current) setShowCheckmark(false);
         try {
           if (isMounted.current) setStudentId(parsed.studentId);
-          const res = await fetch(`${API_BASE_URL}/api/student/${parsed.studentId}`);
-          if (!res.ok) {
-            if (res.status === 409) {
-              addToast({
-                type: "error",
-                title: "Duplicate Scan",
-                message: "This student has already been scanned for this stage.",
-                duration: 4000
-              });
-              if (isMounted.current) {
-                setScanErrorTrigger(true);
-                setScanSuccess(false);
-                setIsLoading(false);
-                setShowCheckmark(false);
-                
-                // Save duplicate scan analytics data
-                addLog({
-                  studentId: parsed.studentId,
-                  studentName: 'Unknown',
-                  stage: stage,
-                  volunteerName: user?.displayName || user?.email?.split('@')[0] || 'Unknown',
-                  timestamp: new Date().toISOString(),
-                  action: "scanned",
-                  result: "duplicate",
-                  error: "Student already scanned for this stage"
-                });
-              }
-              return;
-            } else if (res.status === 403) {
+
+          // Fetch student data
+          const studentRes = await fetch(`${API_BASE_URL}/api/student/${parsed.studentId}`);
+          if (!studentRes.ok) {
+            if (studentRes.status === 403) {
               throw new Error("Student not found or access denied");
-            } else if (res.status === 404) {
+            } else if (studentRes.status === 404) {
               throw new Error("Student not found in database");
             } else {
-              throw new Error(`Server error: ${res.status}`);
+              throw new Error(`Server error: ${studentRes.status}`);
             }
           }
-          const result = await res.json();
+          const studentData = await studentRes.json();
+
+          // Only fetch payment info for arrival stage
+          let dueAmount = null;
+          if (stage.toLowerCase() === 'arrival') {
+            try {
+              const paymentRes = await fetch(`${API_BASE_URL}/api/scan/payment/${parsed.studentId}`);
+              if (paymentRes.ok) {
+                const paymentData = await paymentRes.json();
+                dueAmount = paymentData.dueAmount;
+              }
+            } catch {
+              // Ignore payment fetch errors, just show not available
+            }
+          }
+
+          // Combine student data with dueAmount
+          const result = { ...studentData, dueAmount };
+
           if (isMounted.current) {
             setStudentData(result);
             addToast({
@@ -96,7 +90,7 @@ export function useScanHandler(stage = 'Unknown') {
               message: `Student ID: ${parsed.studentId}`,
               duration: 3000
             });
-            
+
             // Save detailed analytics data
             addLog({
               studentId: parsed.studentId,
@@ -121,7 +115,7 @@ export function useScanHandler(stage = 'Unknown') {
             setScanSuccess(false);
             setIsLoading(false);
             setShowCheckmark(false);
-            
+
             // Save error analytics data
             addLog({
               studentId: parsed.studentId,
@@ -138,9 +132,10 @@ export function useScanHandler(stage = 'Unknown') {
           if (isMounted.current) {
             setScanSuccess(false);
             setIsLoading(false);
+            processingRef.current = false;
           }
         }
-      }, 600);
+      }, 500);
     } catch (error) {
       if (isMounted.current) {
         setScanErrorTrigger(true);
@@ -153,7 +148,7 @@ export function useScanHandler(stage = 'Unknown') {
         setScanSuccess(false);
         setIsLoading(false);
         setShowCheckmark(false);
-        
+
         // Save invalid QR code analytics data
         addLog({
           studentId: null,

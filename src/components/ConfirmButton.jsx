@@ -14,59 +14,49 @@ const ConfirmButton = ({ studentId, stage, onReset, studentData }) => {
   const [showVisitorModal, setShowVisitorModal] = useState(false);
   const [showLanyardPreview, setShowLanyardPreview] = useState(false);
   const [visitorCount, setVisitorCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const handleConfirm = async () => {
+    setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/scan/${stage}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentId, volunteerName }),
+      // Determine the correct endpoint based on stage
+      const endpoint = stage === 'arrival' ? 'arrival' : stage;
+      const res = await fetch(`${API_BASE_URL}/api/scan/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId,
+          volunteerName,
+        }),
       });
-
-      const data = await res.json();
-
+      
       if (!res.ok) {
-        // Handle specific error cases
-        if (res.status === 409) {
-          // Already completed
-          addToast({
-            type: 'warning',
-            title: `${stage.charAt(0).toUpperCase() + stage.slice(1)} already completed for ${studentId}`,
-            duration: 4000
-          });
-        } else if (res.status === 404) {
-          // Student not found
-          addToast({
-            type: 'error',
-            title: `Student not found: ${studentId}`,
-            duration: 4000
-          });
-        } else {
-          // Generic error
-          throw new Error(data.error || 'Failed to update status');
-        }
-        return;
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Failed to confirm ${stage}`);
       }
-
-      // Success case
+      
+      await res.json();
       addToast({
         type: 'success',
         title: `${stage.charAt(0).toUpperCase() + stage.slice(1)} confirmed for ${studentId}`,
         duration: 3500
       });
-
+      
       // For arrival stage, show visitor count modal
       if (stage === 'arrival') {
         setShowVisitorModal(true);
       } else {
+        // For other stages, just reset the scanner
         onReset();
       }
     } catch (error) {
       addToast({
         type: 'error',
-        title: `Failed to update status: ${error.message}`,
+        title: `Failed to confirm: ${error.message}`,
         duration: 4000
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,8 +144,8 @@ const ConfirmButton = ({ studentId, stage, onReset, studentData }) => {
 
   return (
     <>
-      <button className="confirm-btn" onClick={handleConfirm}>
-        ✅ Confirm {stage.charAt(0).toUpperCase() + stage.slice(1)}
+      <button className="confirm-btn" onClick={handleConfirm} disabled={loading}>
+        {loading ? 'Confirming...' : `✅ Confirm ${stage.charAt(0).toUpperCase() + stage.slice(1)}`}
       </button>
 
       {/* Visitor Count Modal */}

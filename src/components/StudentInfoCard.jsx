@@ -106,14 +106,10 @@ const StudentInfoCard = ({ student, currentStage }) => {
 
       <div className="student-main-fields">
         <div className="student-row">
-          <span className="student-label">Phone:</span>
-          <span className="student-value">{student.phone || "Not available"}</span>
+          <span className="student-label">Due Amount:</span>
+          <span className="student-value">{typeof student.dueAmount === 'number' ? `₹${student.dueAmount.toLocaleString()}` : 'Not available'}</span>
         </div>
         <div className="student-row">
-          <span className="student-label">Aadhaar:</span>
-          <span className="student-value">{student.aadhaar || "Not available"}</span>
-        </div>
-          <div className="student-row">
           <span className="student-label">Email:</span>
           <span className="student-value">{student.email || "Not available"}</span>
         </div>
