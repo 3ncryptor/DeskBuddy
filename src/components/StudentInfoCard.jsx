@@ -3,10 +3,30 @@ import "../styles/StudentInfoCard.css";
 import avatar from "../assets/avitar.webp"; // fallback to .svg if .png not found
 
 const stageLabels = {
-  arrival: { label: "Arrival", statusKey: "arrival", verifiedByKey: "arrivalVerifiedBy", icon: "🏠" },
-  hostel: { label: "Hostel", statusKey: "hostelVerified", verifiedByKey: "hostelVerifiedBy", icon: "🏢" },
-  documents: { label: "Documents", statusKey: "documentsVerified", verifiedByKey: "documentsVerifiedBy", icon: "📄" },
-  kit: { label: "Kit", statusKey: "kitReceived", verifiedByKey: "kitReceivedBy", icon: "📦" }
+  arrival: {
+    label: "Arrival",
+    statusKey: "arrival",
+    verifiedByKey: "arrivalVerifiedBy",
+    icon: "🏠",
+  },
+  hostel: {
+    label: "Hostel",
+    statusKey: "hostelVerified",
+    verifiedByKey: "hostelVerifiedBy",
+    icon: "🏢",
+  },
+  documents: {
+    label: "Documents",
+    statusKey: "documentsVerified",
+    verifiedByKey: "documentsVerifiedBy",
+    icon: "📄",
+  },
+  kit: {
+    label: "Kit",
+    statusKey: "kitReceived",
+    verifiedByKey: "kitReceivedBy",
+    icon: "📦",
+  },
 };
 
 const StudentInfoCard = ({ student, currentStage }) => {
@@ -19,7 +39,7 @@ const StudentInfoCard = ({ student, currentStage }) => {
   if (student) {
     // Calculate completion percentage
     const stages = Object.values(stageLabels);
-    completedStages = stages.filter(s => student[s.statusKey]).length;
+    completedStages = stages.filter((s) => student[s.statusKey]).length;
     completionPercentage = (completedStages / totalStages) * 100;
   }
 
@@ -30,7 +50,7 @@ const StudentInfoCard = ({ student, currentStage }) => {
       label: stage.label,
       completed,
       verifiedBy,
-      icon: stage.icon
+      icon: stage.icon,
     };
   }
 
@@ -44,16 +64,22 @@ const StudentInfoCard = ({ student, currentStage }) => {
 
   if (!student) {
     return (
-      <div className={`student-card professional-card fade-in wide big ${getCardColorClass()}`}>
+      <div
+        className={`student-card professional-card fade-in wide big ${getCardColorClass()}`}
+      >
         <div className="student-card-header big">
           <div className="avatar-container">
-            <img src={avatar} alt="Student Avatar" className="student-avatar big" />
+            <img
+              src={avatar}
+              alt="Student Avatar"
+              className="student-avatar big"
+            />
             <div className="avatar-status neutral">⏳</div>
           </div>
           <div className="student-header-info">
             <span className="student-name big">No Student Data</span>
             <div className="progress-bar">
-              <div className="progress-fill" style={{ width: '0%' }}></div>
+              <div className="progress-fill" style={{ width: "0%" }}></div>
             </div>
           </div>
         </div>
@@ -68,19 +94,40 @@ const StudentInfoCard = ({ student, currentStage }) => {
   }
 
   return (
-    <div className={`student-card professional-card fade-in wide big ${getCardColorClass()}`}>
+    <div
+      className={`student-card professional-card fade-in wide big ${getCardColorClass()}`}
+    >
       <div className="student-card-header big">
         <div className="avatar-container">
-          <img src={avatar} alt="Student Avatar" className="student-avatar big" />
-          <div className={`avatar-status ${completionPercentage === 100 ? 'completed' : completionPercentage >= 50 ? 'in-progress' : 'pending'}`}>
-            {completionPercentage === 100 ? '✅' : completionPercentage >= 50 ? '🔄' : '⏳'}
+          <img
+            src={avatar}
+            alt="Student Avatar"
+            className="student-avatar big"
+          />
+          <div
+            className={`avatar-status ${
+              completionPercentage === 100
+                ? "completed"
+                : completionPercentage >= 50
+                ? "in-progress"
+                : "pending"
+            }`}
+          >
+            {completionPercentage === 100
+              ? "✅"
+              : completionPercentage >= 50
+              ? "🔄"
+              : "⏳"}
           </div>
         </div>
         <div className="student-header-info">
           <span className="student-name big">{student.name}</span>
           <div className="progress-section">
             <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `${completionPercentage}%` }}></div>
+              <div
+                className="progress-fill"
+                style={{ width: `${completionPercentage}%` }}
+              ></div>
             </div>
             <div className="progress-text">
               {completedStages}/{totalStages} stages completed
@@ -97,21 +144,35 @@ const StudentInfoCard = ({ student, currentStage }) => {
         <div className="stat-item">
           <span className="stat-label">Group:</span>
           <span className="stat-value">{student.group || "Not assigned"}</span>
-              </div>
+        </div>
         <div className="stat-item">
           <span className="stat-label">Room:</span>
-          <span className="stat-value">{student.roomNumber || "Not assigned"}</span>
-              </div>
+          <span className="stat-value">
+            {student.roomNumber || "Not assigned"}
+          </span>
+        </div>
       </div>
 
       <div className="student-main-fields">
         <div className="student-row">
           <span className="student-label">Due Amount:</span>
-          <span className="student-value">{typeof student.dueAmount === 'number' ? `₹${student.dueAmount.toLocaleString()}` : 'Not available'}</span>
+          <span className="student-value">
+            {typeof student.dueAmount === "number"
+              ? `₹${student.dueAmount.toLocaleString()}`
+              : "Not available"}
+          </span>
         </div>
         <div className="student-row">
           <span className="student-label">Email:</span>
-          <span className="student-value">{student.email || "Not available"}</span>
+          <span className="student-value">
+            {student.email || "Not available"}
+          </span>
+        </div>
+        <div className="student-row">
+          <span className="student-label">Program:</span>
+          <span className="student-value">
+            {student.program || "Not available"}
+          </span>
         </div>
       </div>
 
@@ -122,11 +183,17 @@ const StudentInfoCard = ({ student, currentStage }) => {
           </div>
           <div className="scan-status-row single">
             <span className="scan-status-label">{status.label}:</span>
-            <span className={`scan-status-chip animated-chip ${status.completed ? "yes" : "no"}`}>
+            <span
+              className={`scan-status-chip animated-chip ${
+                status.completed ? "yes" : "no"
+              }`}
+            >
               {status.completed ? "✅ Completed" : "⏳ Pending"}
             </span>
             <span className="scan-status-by">
-              {status.completed ? `by ${status.verifiedBy || "Unknown"}` : "Not assigned"}
+              {status.completed
+                ? `by ${status.verifiedBy || "Unknown"}`
+                : "Not assigned"}
             </span>
           </div>
         </div>
@@ -139,10 +206,17 @@ const StudentInfoCard = ({ student, currentStage }) => {
             const isCompleted = student[stageInfo.statusKey];
             const isCurrent = key === currentStage;
             return (
-              <div key={key} className={`stage-item ${isCompleted ? 'completed' : isCurrent ? 'current' : 'pending'}`}>
+              <div
+                key={key}
+                className={`stage-item ${
+                  isCompleted ? "completed" : isCurrent ? "current" : "pending"
+                }`}
+              >
                 <span className="stage-icon">{stageInfo.icon}</span>
                 <span className="stage-name">{stageInfo.label}</span>
-                <span className="stage-status">{isCompleted ? '✅' : isCurrent ? '🔄' : '⏳'}</span>
+                <span className="stage-status">
+                  {isCompleted ? "✅" : isCurrent ? "🔄" : "⏳"}
+                </span>
               </div>
             );
           })}
