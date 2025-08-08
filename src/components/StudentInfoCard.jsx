@@ -54,9 +54,25 @@ const StudentInfoCard = ({ student, currentStage }) => {
     };
   }
 
-  // Determine card color based on completion
+  // Determine card color based on group
   const getCardColorClass = () => {
     if (!student) return "neutral";
+    
+    // Get the group from student data
+    const group = student.group;
+    if (!group) return "neutral";
+    
+    // Convert group to lowercase for case-insensitive comparison
+    const groupLower = group.toLowerCase();
+    
+    // Check if group contains "red" or "blue" keywords
+    if (groupLower.includes("red")) {
+      return "group-red";
+    } else if (groupLower.includes("blue")) {
+      return "group-blue";
+    }
+    
+    // Default fallback based on completion if group doesn't match
     if (completionPercentage === 100) return "completed";
     if (completionPercentage >= 50) return "in-progress";
     return "pending";

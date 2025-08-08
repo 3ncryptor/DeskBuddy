@@ -439,6 +439,117 @@
   box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10);
 }
 
+/* Group-based color coding */
+.student-card.professional-card.group-red {
+  border-color: #dc2626;
+  background: linear-gradient(135deg, #fecaca 0%, #fecaca 50%, #fee2e2 100%);
+  box-shadow: 0 4px 24px 0 rgba(220, 38, 38, 0.35);
+}
+
+.student-card.professional-card.group-red .student-card-header.big {
+  background: rgba(254, 202, 202, 0.95);
+  border-bottom: 1.5px solid #fca5a5;
+}
+
+.student-card.professional-card.group-red .student-name.big {
+  color: #7f1d1d;
+}
+
+.student-card.professional-card.group-red .progress-fill {
+  background: linear-gradient(90deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.student-card.professional-card.group-red .quick-stats {
+  background: #fca5a5;
+  border: 1px solid #f87171;
+}
+
+.student-card.professional-card.group-red .student-main-fields {
+  background: #fca5a5;
+  border: 1px solid #f87171;
+}
+
+.student-card.professional-card.group-red .scan-status-section.single {
+  background: #fca5a5;
+  border: 1px solid #f87171;
+}
+
+.student-card.professional-card.group-red .all-stages-overview {
+  background: #fca5a5;
+  border: 1px solid #f87171;
+}
+
+.student-card.professional-card.group-red .stat-label {
+  color: #7f1d1d;
+}
+
+.student-card.professional-card.group-red .student-label {
+  color: #7f1d1d;
+}
+
+.student-card.professional-card.group-red .scan-status-title {
+  color: #7f1d1d;
+}
+
+.student-card.professional-card.group-red .stages-title {
+  color: #7f1d1d;
+}
+
+.student-card.professional-card.group-blue {
+  border-color: #2563eb;
+  background: linear-gradient(135deg, #bfdbfe 0%, #bfdbfe 50%, #dbeafe 100%);
+  box-shadow: 0 4px 24px 0 rgba(37, 99, 235, 0.35);
+}
+
+.student-card.professional-card.group-blue .student-card-header.big {
+  background: rgba(191, 219, 254, 0.95);
+  border-bottom: 1.5px solid #93c5fd;
+}
+
+.student-card.professional-card.group-blue .student-name.big {
+  color: #1e3a8a;
+}
+
+.student-card.professional-card.group-blue .progress-fill {
+  background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.student-card.professional-card.group-blue .quick-stats {
+  background: #93c5fd;
+  border: 1px solid #60a5fa;
+}
+
+.student-card.professional-card.group-blue .student-main-fields {
+  background: #93c5fd;
+  border: 1px solid #60a5fa;
+}
+
+.student-card.professional-card.group-blue .scan-status-section.single {
+  background: #93c5fd;
+  border: 1px solid #60a5fa;
+}
+
+.student-card.professional-card.group-blue .all-stages-overview {
+  background: #93c5fd;
+  border: 1px solid #60a5fa;
+}
+
+.student-card.professional-card.group-blue .stat-label {
+  color: #1e3a8a;
+}
+
+.student-card.professional-card.group-blue .student-label {
+  color: #1e3a8a;
+}
+
+.student-card.professional-card.group-blue .scan-status-title {
+  color: #1e3a8a;
+}
+
+.student-card.professional-card.group-blue .stages-title {
+  color: #1e3a8a;
+}
+
 .student-card.professional-card.wide.big {
   width: 560px;
   max-width: 99vw;
