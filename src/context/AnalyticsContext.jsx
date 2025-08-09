@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 const AnalyticsContext = createContext();
 
 // Backend API base URL
-const API_BASE_URL = 'http://localhost:3002/api/analytics';
+const API_BASE_URL = 'http://deskbuddy.codesetu.in/api/analytics';
 
 export function AnalyticsProvider({ children }) {
   const [analyticsData, setAnalyticsData] = useState({
