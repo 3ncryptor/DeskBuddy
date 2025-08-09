@@ -1,10 +1,55 @@
 import React, { useMemo, useState } from 'react';
 import { Line } from 'react-chartjs-2';
+import { useAnalytics } from '../../../context/AnalyticsContext';
 
-const HourlyDistributionChart = ({ data }) => {
-  const [timeFrame, setTimeFrame] = useState('60'); // Default to 60 minutes
+const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
+  const { analyticsData } = useAnalytics();
+  const [timeFrame, setTimeFrame] = useState(propTimeFrame || '60'); // Default to 60 minutes
 
   const chartData = useMemo(() => {
+    // Use backend peak hours data if available
+    const peakHoursData = analyticsData?.peakHours;
+    
+    if (peakHoursData && peakHoursData.intervalData) {
+      // Use backend hourly distribution data
+      const allStagesData = peakHoursData.intervalData;
+      const labels = allStagesData.arrival?.map(interval => interval.label) || [];
+      
+      const datasets = [];
+      const colors = {
+        arrival: { border: '#3b82f6', bg: 'rgba(59, 130, 246, 0.2)' },
+        hostel: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.2)' },
+        documents: { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.2)' },
+        kit: { border: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.2)' }
+      };
+      
+      // Only show stages that have data
+      Object.entries(allStagesData).forEach(([stage, intervals]) => {
+        if (intervals && Array.isArray(intervals) && intervals.length > 0) {
+          const hasData = intervals.some(interval => interval.count > 0);
+          if (hasData) {
+            datasets.push({
+              label: stage.charAt(0).toUpperCase() + stage.slice(1),
+              data: intervals.map(interval => interval.count),
+              borderColor: colors[stage]?.border || '#64748b',
+              backgroundColor: colors[stage]?.bg || 'rgba(100, 116, 139, 0.2)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.3,
+              pointBackgroundColor: colors[stage]?.border || '#64748b',
+              pointBorderColor: 'white',
+              pointBorderWidth: 2,
+              pointRadius: 3,
+              pointHoverRadius: 5,
+            });
+          }
+        }
+      });
+      
+      return { labels, datasets };
+    }
+    
+    // Fallback to processing logs data
     if (!data || data.length === 0) {
       return {
         labels: ['No Data'],
@@ -141,7 +186,7 @@ const HourlyDistributionChart = ({ data }) => {
         shadowOffsetY: 2
       }]
     };
-  }, [data, timeFrame]);
+  }, [data, timeFrame, analyticsData?.peakHours]);
 
   const options = {
     responsive: true,

@@ -45,7 +45,7 @@ import ScansOverTimeChart from '../components/analytics/charts/ScansOverTimeChar
 import HourlyDistributionChart from '../components/analytics/charts/HourlyDistributionChart';
 
 const Analytics = () => {
-  const { logs, loading, resetToEmptyData } = useAnalytics();
+  const { logs, loading, resetToEmptyData, analyticsData, error } = useAnalytics();
   const { addToast } = useToast();
   
   // Chart refs for PDF export
@@ -63,36 +63,32 @@ const Analytics = () => {
   });
 
   // Time frame for hourly distribution
-  const [timeFrame, setTimeFrame] = useState('24h');
+  const [timeFrame] = useState('24h');
 
   // View all toggle for data table
   const [viewAll, setViewAll] = useState(false);
 
-  // Calculate analytics summary
+  // Calculate analytics summary from backend data
   const stats = useMemo(() => {
-    if (!logs.length) {
+    if (!analyticsData.summary) {
       return {
         totalScans: 0,
         uniqueStudents: 0,
-        uniqueVolunteers: 0
+        uniqueVolunteers: 0,
+        completedStudents: 0
       };
     }
 
-    // Total scans: count each individual scan event
-    const totalScans = logs.length;
-    
-    // Unique students: count unique student IDs
-    const uniqueStudents = new Set(logs.map(log => log.studentId).filter(Boolean)).size;
-    
-    // Unique volunteers: count unique volunteer names
-    const uniqueVolunteers = new Set(logs.map(log => log.volunteerName).filter(Boolean)).size;
-    
+    // Calculate completed students from stage distribution
+    const completedStudents = analyticsData.summary.stageDistribution?.completed || 0;
+
     return {
-      totalScans,
-      uniqueStudents,
-      uniqueVolunteers
+      totalScans: analyticsData.summary.totalScans || 0,
+      uniqueStudents: analyticsData.summary.totalStudents || 0,
+      uniqueVolunteers: analyticsData.summary.uniqueVolunteers || 0,
+      completedStudents: completedStudents
     };
-  }, [logs]);
+  }, [analyticsData.summary]);
 
   // Filter logs based on current filters
   const filteredLogs = useMemo(() => {
@@ -241,6 +237,38 @@ const Analytics = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="analytics-page">
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '50vh',
+          fontSize: '1.2rem',
+          color: '#ef4444'
+        }}>
+          <p>Error loading analytics data: {error}</p>
+          <button 
+            onClick={resetToEmptyData}
+            style={{
+              marginTop: '1rem',
+              padding: '0.5rem 1rem',
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer'
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="analytics-page">
       {/* Header - Matching Dashboard Style */}
@@ -266,7 +294,7 @@ const Analytics = () => {
               fontSize: '0.875rem'
             }}
           >
-            Clear All Data
+            Refresh Data
           </button>
           <ExportButton onExport={handleExport} />
         </div>
@@ -282,23 +310,30 @@ const Analytics = () => {
           delay={0}
         />
         <SummaryCard
-          title="Students"
+          title="Total Students"
           value={stats.uniqueStudents}
           icon="👥"
           color="#10b981"
           delay={100}
         />
         <SummaryCard
-          title="Volunteers Active"
+          title="Completed Journey"
+          value={stats.completedStudents}
+          icon="✅"
+          color="#059669"
+          delay={200}
+        />
+        <SummaryCard
+          title="Active Volunteers"
           value={stats.uniqueVolunteers}
           icon="🤝"
           color="#f59e0b"
-          delay={200}
+          delay={300}
         />
       </div>
 
       {/* Show message when no data */}
-      {!logs.length ? (
+      {!analyticsData.summary || stats.totalScans === 0 ? (
         <div className="no-data">
           <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
             <path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/>
@@ -324,6 +359,50 @@ const Analytics = () => {
             />
           </div>
 
+          {/* Key Insights Section */}
+          {analyticsData.summary && (
+            <div className="insights-section">
+              <div className="insights-header">
+                <h3>📊 Key Insights</h3>
+                <p>Real-time analytics from your onboarding system</p>
+              </div>
+              <div className="insights-grid">
+                <div className="insight-card">
+                  <div className="insight-icon">🎯</div>
+                  <div className="insight-content">
+                    <h4>Completion Rate</h4>
+                    <p className="insight-value">{((stats.completedStudents / stats.uniqueStudents) * 100).toFixed(1)}%</p>
+                    <p className="insight-desc">Students completed all stages</p>
+                  </div>
+                </div>
+                <div className="insight-card">
+                  <div className="insight-icon">⚡</div>
+                  <div className="insight-content">
+                    <h4>Biggest Bottleneck</h4>
+                    <p className="insight-value">{analyticsData.summary.insights?.biggestDropoff?.stage || 'N/A'}</p>
+                    <p className="insight-desc">{analyticsData.summary.insights?.biggestDropoff?.percentage || 'N/A'} progression rate</p>
+                  </div>
+                </div>
+                <div className="insight-card">
+                  <div className="insight-icon">⏰</div>
+                  <div className="insight-content">
+                    <h4>Peak Activity</h4>
+                    <p className="insight-value">{analyticsData.peakHours?.overallPeakInterval?.label || 'N/A'}</p>
+                    <p className="insight-desc">{analyticsData.peakHours?.overallPeakInterval?.count || 0} scans at peak hour</p>
+                  </div>
+                </div>
+                <div className="insight-card">
+                  <div className="insight-icon">🚀</div>
+                  <div className="insight-content">
+                    <h4>Avg Journey Time</h4>
+                    <p className="insight-value">{analyticsData.stageTiming?.stageTimings?.overallJourney?.average || 'N/A'}</p>
+                    <p className="insight-desc">From arrival to completion</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Charts Section */}
           <div className="chart-display-card">
             <div className="chart-header">
@@ -338,13 +417,13 @@ const Analytics = () => {
                 </div>
               </ChartCard>
               
-              <ChartCard title="Scans by Volunteer" icon="👤">
+              <ChartCard title="Top Volunteers" icon="👤">
                 <div ref={scansByVolunteerRef}>
                   <ScansByVolunteerChart data={filteredLogs} />
                 </div>
               </ChartCard>
               
-              <ChartCard title="Scans Over Time" icon="📈">
+              <ChartCard title="Activity Timeline" icon="📈">
                 <div ref={scansOverTimeRef}>
                   <ScansOverTimeChart data={filteredLogs} />
                 </div>
@@ -353,25 +432,8 @@ const Analytics = () => {
         <ChartCard
                 title="Peak Hours Analysis" 
                 icon="⏰"
-                subtitle={`Last ${timeFrame === '24h' ? '24 hours' : timeFrame === '7d' ? '7 days' : '30 days'}`}
+                subtitle="Hourly scan distribution across all stages"
               >
-                <div className="chart-controls">
-                  <select 
-                    value={timeFrame} 
-                    onChange={(e) => setTimeFrame(e.target.value)}
-                    style={{
-                      padding: '0.5rem',
-                      borderRadius: '8px',
-                      border: '1px solid #e3e8f7',
-                      background: 'white',
-                      fontSize: '0.875rem'
-                    }}
-                  >
-                    <option value="24h">Last 24 Hours</option>
-                    <option value="7d">Last 7 Days</option>
-                    <option value="30d">Last 30 Days</option>
-                  </select>
-                </div>
                 <div ref={hourlyDistributionRef}>
                   <HourlyDistributionChart data={filteredLogs} timeFrame={timeFrame} />
                 </div>

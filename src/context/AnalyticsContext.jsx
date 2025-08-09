@@ -2,68 +2,158 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const AnalyticsContext = createContext();
 
-const ANALYTICS_STORAGE_KEY = 'deskbuddy_analytics_logs';
+// Backend API base URL
+const API_BASE_URL = 'http://localhost:3002/api/analytics';
 
 export function AnalyticsProvider({ children }) {
-  const [logs, setLogs] = useState([]);
+  const [analyticsData, setAnalyticsData] = useState({
+    summary: null,
+    pendingCounts: null,
+    volunteerStats: null,
+    peakHours: null,
+    stageTiming: null,
+    studentJourneys: null
+  });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Load data from localStorage
-  useEffect(() => {
+  // Fetch analytics data from backend
+  const fetchAnalyticsData = async () => {
     try {
-      const storedLogs = localStorage.getItem(ANALYTICS_STORAGE_KEY);
-      if (storedLogs) {
-        const parsedLogs = JSON.parse(storedLogs);
-        setLogs(parsedLogs);
-      } else {
-        // No data available yet - start with empty array
-        setLogs([]);
-      }
+      setLoading(true);
+      setError(null);
+
+      // Fetch all analytics endpoints in parallel
+      const [summaryRes, pendingRes, volunteerRes, peakHoursRes, stageTimingRes, studentJourneysRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/summary`),
+        fetch(`${API_BASE_URL}/pending-counts`),
+        fetch(`${API_BASE_URL}/volunteer-stats`),
+        fetch(`${API_BASE_URL}/peak-hours`),
+        fetch(`${API_BASE_URL}/stage-timing`),
+        fetch(`${API_BASE_URL}/student-journey`)
+      ]);
+
+      // Parse responses
+      const [summary, pendingCounts, volunteerStats, peakHours, stageTiming, studentJourneys] = await Promise.all([
+        summaryRes.json(),
+        pendingRes.json(),
+        volunteerRes.json(),
+        peakHoursRes.json(),
+        stageTimingRes.json(),
+        studentJourneysRes.json()
+      ]);
+
+      setAnalyticsData({
+        summary,
+        pendingCounts,
+        volunteerStats,
+        peakHours,
+        stageTiming,
+        studentJourneys
+      });
     } catch (error) {
-      console.error('Error loading analytics data:', error);
-      // Fallback to empty array
-      setLogs([]);
+      console.error('Error fetching analytics data:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchAnalyticsData();
   }, []);
 
-  // Save to localStorage on change
-  useEffect(() => {
-    if (!loading) {
-    localStorage.setItem(ANALYTICS_STORAGE_KEY, JSON.stringify(logs));
-    }
-  }, [logs, loading]);
+  // Refresh analytics data
+  const refreshData = () => {
+    fetchAnalyticsData();
+  };
 
-  // Add a new scan log
-  const addLog = (log) => {
-    const newLog = {
-      ...log,
-      timestamp: log.timestamp || new Date().toISOString(),
-      id: `${log.studentId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  // Get processed logs for charts (convert backend data to frontend format)
+  const getProcessedLogs = () => {
+    if (!analyticsData.studentJourneys) return [];
+    
+    const logs = [];
+    analyticsData.studentJourneys.forEach(student => {
+      // Add arrival log
+      if (student.arrivalTime) {
+        logs.push({
+          id: `${student.studentId}-arrival`,
+          studentId: student.studentId,
+          studentName: student.name,
+          stage: 'arrival',
+          volunteerName: student.arrivalVerifiedBy,
+          timestamp: student.arrivalTime
+        });
+      }
+      // Add hostel log
+      if (student.hostelVerifiedTime) {
+        logs.push({
+          id: `${student.studentId}-hostel`,
+          studentId: student.studentId,
+          studentName: student.name,
+          stage: 'hostel',
+          volunteerName: student.hostelVerifiedBy,
+          timestamp: student.hostelVerifiedTime
+        });
+      }
+      // Add documents log
+      if (student.documentsVerifiedTime) {
+        logs.push({
+          id: `${student.studentId}-documents`,
+          studentId: student.studentId,
+          studentName: student.name,
+          stage: 'documents',
+          volunteerName: student.documentsVerifiedBy,
+          timestamp: student.documentsVerifiedTime
+        });
+      }
+      // Add kit log
+      if (student.kitReceivedTime) {
+        logs.push({
+          id: `${student.studentId}-kit`,
+          studentId: student.studentId,
+          studentName: student.name,
+          stage: 'kit',
+          volunteerName: student.kitReceivedBy,
+          timestamp: student.kitReceivedTime
+        });
+      }
+    });
+    
+    return logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  };
+
+  // Get analytics summary (compatible with old format)
+  const getAnalyticsSummary = () => {
+    if (!analyticsData.summary) return {
+      totalScans: 0,
+      uniqueStudents: 0,
+      uniqueVolunteers: 0
     };
-    setLogs((prev) => [...prev, newLog]);
+
+    return {
+      totalScans: analyticsData.summary.totalScans || 0,
+      uniqueStudents: analyticsData.summary.totalStudents || 0,
+      uniqueVolunteers: analyticsData.summary.uniqueVolunteers || 0
+    };
   };
 
-  // Clear all logs
-  const clearLogs = () => {
-    setLogs([]);
-    localStorage.removeItem(ANALYTICS_STORAGE_KEY);
-  };
-
-  // Reset to empty data
-  const resetToEmptyData = () => {
-    setLogs([]);
-    localStorage.removeItem(ANALYTICS_STORAGE_KEY);
-  };
-
-  // Export logs as CSV
+  // Export logs as CSV (using processed logs)
   const exportLogs = () => {
+    const logs = getProcessedLogs();
     if (!logs.length) return;
-    const header = Object.keys(logs[0]);
+    
+    const header = ['Student Name', 'Student ID', 'Stage', 'Volunteer', 'Timestamp'];
     const csvRows = [header.join(',')];
     logs.forEach(log => {
-      csvRows.push(header.map(key => `"${(log[key] ?? '').toString().replace(/"/g, '""')}"`).join(','));
+      csvRows.push([
+        log.studentName || '',
+        log.studentId || '',
+        log.stage || '',
+        log.volunteerName || '',
+        new Date(log.timestamp).toLocaleString()
+      ].map(field => `"${field.toString().replace(/"/g, '""')}"`).join(','));
     });
     const csvContent = csvRows.join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -75,85 +165,32 @@ export function AnalyticsProvider({ children }) {
     URL.revokeObjectURL(url);
   };
 
-  // Get analytics summary
-  const getAnalyticsSummary = () => {
-    if (!logs.length) return null;
-
-    // Total scans: count each individual scan event
-    const totalScans = logs.length;
-    
-    // Unique students: count unique student IDs
-    const uniqueStudents = new Set(logs.map(log => log.studentId).filter(Boolean)).size;
-    
-    // Unique volunteers: count unique volunteer names
-    const uniqueVolunteers = new Set(logs.map(log => log.volunteerName).filter(Boolean)).size;
-    
-    // Stage distribution
-    const stageCounts = {};
-    logs.forEach(log => {
-      const stage = log.stage || 'Unknown';
-      stageCounts[stage] = (stageCounts[stage] || 0) + 1;
-    });
-
-    // Volunteer performance
-    const volunteerCounts = {};
-    logs.forEach(log => {
-      const volunteer = log.volunteerName || 'Unknown';
-      volunteerCounts[volunteer] = (volunteerCounts[volunteer] || 0) + 1;
-    });
-
-    // Student journey analysis
-    const studentJourneys = {};
-    logs.forEach(log => {
-      const studentId = log.studentId;
-      if (studentId) {
-        if (!studentJourneys[studentId]) {
-          studentJourneys[studentId] = {
-            name: log.studentName,
-            stages: new Set(),
-            totalScans: 0
-          };
-        }
-        studentJourneys[studentId].stages.add(log.stage);
-        studentJourneys[studentId].totalScans += 1;
-      }
-    });
-
-    // Calculate completion rates
-    const totalStudents = Object.keys(studentJourneys).length;
-    const completedStudents = Object.values(studentJourneys).filter(
-      journey => journey.stages.has('Arrival') && 
-                journey.stages.has('Kit') && 
-                journey.stages.has('Hostel') && 
-                journey.stages.has('Documents')
-    ).length;
-
-    return {
-      totalScans,
-      uniqueStudents,
-      uniqueVolunteers,
-      stageCounts,
-      volunteerCounts,
-      studentJourneys,
-      completionRate: totalStudents > 0 ? (completedStudents / totalStudents * 100).toFixed(1) : 0
-    };
+  const value = {
+    // Backward compatibility
+    logs: getProcessedLogs(),
+    loading,
+    error,
+    // New backend data
+    analyticsData,
+    refreshData,
+    exportLogs,
+    getAnalyticsSummary,
+    // Legacy methods for compatibility
+    resetToEmptyData: refreshData,
+    clearLogs: refreshData
   };
 
   return (
-    <AnalyticsContext.Provider value={{ 
-      logs, 
-      loading,
-      addLog, 
-      clearLogs,
-      resetToEmptyData,
-      exportLogs,
-      getAnalyticsSummary
-    }}>
+    <AnalyticsContext.Provider value={value}>
       {children}
     </AnalyticsContext.Provider>
   );
 }
 
 export function useAnalytics() {
-  return useContext(AnalyticsContext);
-} 
+  const context = useContext(AnalyticsContext);
+  if (context === undefined) {
+    throw new Error('useAnalytics must be used within an AnalyticsProvider');
+  }
+  return context;
+}

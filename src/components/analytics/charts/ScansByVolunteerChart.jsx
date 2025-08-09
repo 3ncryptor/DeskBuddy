@@ -1,48 +1,81 @@
 import React, { useMemo } from 'react';
 import { Bar } from 'react-chartjs-2';
+import { useAnalytics } from '../../../context/AnalyticsContext';
 
 const ScansByVolunteerChart = ({ data }) => {
+  const { analyticsData } = useAnalytics();
+  
   const chartData = useMemo(() => {
-    if (!data || data.length === 0) {
+    // Use backend volunteer stats if available, otherwise fall back to processed logs
+    const volunteerData = analyticsData?.volunteerStats?.volunteers;
+    
+    if (!volunteerData || volunteerData.length === 0) {
+      // Fallback to processing logs data
+      if (!data || data.length === 0) {
+        return {
+          labels: ['No Data'],
+          datasets: [{
+            label: 'Scans by Volunteer',
+            data: [0],
+            backgroundColor: '#64748b',
+            borderColor: '#64748b',
+            borderWidth: 1,
+          }]
+        };
+      }
+
+      const volunteerCounts = {};
+      data.forEach(log => {
+        const volunteer = log.volunteerName || 'Unknown';
+        volunteerCounts[volunteer] = (volunteerCounts[volunteer] || 0) + 1;
+      });
+      
+      // Sort by count and take top 10
+      const sortedVolunteers = Object.entries(volunteerCounts)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 10);
+      
+      const colors = [
+        '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6',
+        '#ef4444', '#06b6d4', '#84cc16', '#f97316',
+        '#ec4899', '#6366f1'
+      ];
+      
       return {
-        labels: ['No Data'],
+        labels: sortedVolunteers.map(([name]) => name),
         datasets: [{
-          label: 'Scans by Volunteer',
-          data: [0],
-          backgroundColor: ['#64748b'],
-          borderColor: ['#64748b'],
+          label: 'Students Processed',
+          data: sortedVolunteers.map(([, count]) => count),
+          backgroundColor: colors.slice(0, sortedVolunteers.length),
+          borderColor: colors.slice(0, sortedVolunteers.length).map(color => color),
           borderWidth: 2,
           borderRadius: 8,
           borderSkipped: false,
         }]
       };
     }
-
-    const volunteerCounts = {};
-    data.forEach(log => {
-      const volunteer = log.volunteerName || 'Unknown';
-      volunteerCounts[volunteer] = (volunteerCounts[volunteer] || 0) + 1;
-    });
     
+    // Use backend volunteer stats data
+    const topVolunteers = volunteerData.slice(0, 10);
     const colors = [
       '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6',
       '#ef4444', '#06b6d4', '#84cc16', '#f97316',
-      '#ec4899', '#14b8a6', '#f43f5e', '#6366f1'
+      '#ec4899', '#6366f1'
     ];
     
     return {
-      labels: Object.keys(volunteerCounts),
+      labels: topVolunteers.map(volunteer => volunteer.name),
       datasets: [{
-        label: 'Scans by Volunteer',
-        data: Object.values(volunteerCounts),
-        backgroundColor: colors.slice(0, Object.keys(volunteerCounts).length),
-        borderColor: colors.slice(0, Object.keys(volunteerCounts).length),
+        label: 'Students Processed',
+        data: topVolunteers.map(volunteer => volunteer.totalStudents),
+        backgroundColor: colors.slice(0, topVolunteers.length),
+        borderColor: colors.slice(0, topVolunteers.length).map(color => color),
         borderWidth: 2,
         borderRadius: 8,
         borderSkipped: false,
       }]
     };
-  }, [data]);
+  }, [data, analyticsData?.volunteerStats]);
 
   const options = {
     responsive: true,
