@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-const ChartCard = ({ title, subtitle, icon, children }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+const ChartCard = ({ title, subtitle, icon, children, expandable = true, defaultExpanded = false }) => {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   return (
     <div className="chart-card">
@@ -17,21 +17,23 @@ const ChartCard = ({ title, subtitle, icon, children }) => {
             </p>
           )}
         </div>
-        <div className="chart-controls">
-          <button 
-            className="expand-button"
-            onClick={() => setIsExpanded(!isExpanded)}
-            aria-label={isExpanded ? 'Collapse chart' : 'Expand chart'}
-          >
-            <span className={`expand-icon ${isExpanded ? 'expanded' : ''}`}>
-              {isExpanded ? '−' : '+'}
-            </span>
-          </button>
-        </div>
+        {expandable && (
+          <div className="chart-controls">
+            <button 
+              className="expand-button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              aria-label={isExpanded ? 'Collapse chart' : 'Expand chart'}
+            >
+              <span className={`expand-icon ${isExpanded ? 'expanded' : ''}`}>
+                {isExpanded ? '−' : '+'}
+              </span>
+            </button>
+          </div>
+        )}
       </div>
       
       <div className="chart-content">
-        <div className="chart-container" style={{ height: isExpanded ? '800px' : '600px' }}>
+        <div className="chart-container" style={{ height: (!expandable || isExpanded) ? '800px' : '600px' }}>
           {children}
         </div>
       </div>

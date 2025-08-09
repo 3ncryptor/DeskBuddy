@@ -43,9 +43,10 @@ import ScansByStageChart from '../components/analytics/charts/ScansByStageChart'
 import ScansByVolunteerChart from '../components/analytics/charts/ScansByVolunteerChart';
 import ScansOverTimeChart from '../components/analytics/charts/ScansOverTimeChart';
 import HourlyDistributionChart from '../components/analytics/charts/HourlyDistributionChart';
+import LiveStageCounts from '../components/analytics/LiveStageCounts';
 
 const Analytics = () => {
-  const { logs, loading, resetToEmptyData, analyticsData, error } = useAnalytics();
+  const { logs, loading, resetToEmptyData, analyticsData, error, lastUpdated, autoRefresh, setAutoRefresh } = useAnalytics();
   const { addToast } = useToast();
   
   // Chart refs for PDF export
@@ -281,6 +282,33 @@ const Analytics = () => {
           </div>
         </div>
         <div className="dashboard-header-right">
+          {/* Live Update Toggle */}
+          <button 
+            onClick={() => setAutoRefresh(!autoRefresh)}
+            style={{
+              background: autoRefresh ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.2)',
+              border: `1px solid ${autoRefresh ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 255, 255, 0.3)'}`,
+              borderRadius: '8px',
+              padding: '0.5rem 1rem',
+              color: autoRefresh ? '#10b981' : '#64748b',
+              cursor: 'pointer',
+              marginRight: '1rem',
+              fontSize: '0.875rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            <div style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: autoRefresh ? '#10b981' : '#64748b',
+              animation: autoRefresh ? 'pulse 2s infinite' : 'none'
+            }} />
+            {autoRefresh ? 'Live' : 'Paused'}
+          </button>
+          
           <button 
             onClick={resetToEmptyData}
             style={{
@@ -303,13 +331,6 @@ const Analytics = () => {
       {/* Summary Cards */}
       <div className="summary-cards-container">
         <SummaryCard
-          title="Total Scans"
-          value={stats.totalScans}
-          icon="📊"
-          color="#667eea"
-          delay={0}
-        />
-        <SummaryCard
           title="Total Students"
           value={stats.uniqueStudents}
           icon="👥"
@@ -331,6 +352,13 @@ const Analytics = () => {
           delay={300}
         />
       </div>
+
+      {/* Live Stage Counts */}
+      <LiveStageCounts 
+        analyticsData={analyticsData}
+        autoRefresh={autoRefresh}
+        lastUpdated={lastUpdated}
+      />
 
       {/* Show message when no data */}
       {!analyticsData.summary || stats.totalScans === 0 ? (
@@ -387,8 +415,29 @@ const Analytics = () => {
                   <div className="insight-icon">⏰</div>
                   <div className="insight-content">
                     <h4>Peak Activity</h4>
-                    <p className="insight-value">{analyticsData.peakHours?.overallPeakInterval?.label || 'N/A'}</p>
-                    <p className="insight-desc">{analyticsData.peakHours?.overallPeakInterval?.count || 0} scans at peak hour</p>
+                    <p className="insight-value">
+                      {analyticsData.peakHours?.overallPeakInterval?.label || 'N/A'}
+                      {autoRefresh && (
+                        <span style={{ 
+                          fontSize: '0.6rem', 
+                          color: '#10b981', 
+                          marginLeft: '0.5rem',
+                          fontWeight: 'normal'
+                        }}>
+                          LIVE
+                        </span>
+                      )}
+                    </p>
+                    <p className="insight-desc">{analyticsData.peakHours?.overallPeakInterval?.count || 0} scans at peak</p>
+                    {lastUpdated && (
+                      <p style={{ 
+                        fontSize: '0.7rem', 
+                        color: '#64748b', 
+                        marginTop: '0.25rem' 
+                      }}>
+                        Updated: {lastUpdated.toLocaleTimeString()}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="insight-card">
@@ -433,6 +482,8 @@ const Analytics = () => {
                 title="Peak Hours Analysis" 
                 icon="⏰"
                 subtitle="Hourly scan distribution across all stages"
+                expandable={false}
+                defaultExpanded={true}
               >
                 <div ref={hourlyDistributionRef}>
                   <HourlyDistributionChart data={filteredLogs} timeFrame={timeFrame} />

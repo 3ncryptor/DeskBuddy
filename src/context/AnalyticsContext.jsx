@@ -16,6 +16,8 @@ export function AnalyticsProvider({ children }) {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   // Fetch analytics data from backend
   const fetchAnalyticsData = async () => {
@@ -51,6 +53,7 @@ export function AnalyticsProvider({ children }) {
         stageTiming,
         studentJourneys
       });
+      setLastUpdated(new Date());
     } catch (error) {
       console.error('Error fetching analytics data:', error);
       setError(error.message);
@@ -63,6 +66,17 @@ export function AnalyticsProvider({ children }) {
   useEffect(() => {
     fetchAnalyticsData();
   }, []);
+
+  // Auto-refresh functionality
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const interval = setInterval(() => {
+      fetchAnalyticsData();
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [autoRefresh]);
 
   // Refresh analytics data
   const refreshData = () => {
@@ -175,6 +189,10 @@ export function AnalyticsProvider({ children }) {
     refreshData,
     exportLogs,
     getAnalyticsSummary,
+    // Live data features
+    lastUpdated,
+    autoRefresh,
+    setAutoRefresh,
     // Legacy methods for compatibility
     resetToEmptyData: refreshData,
     clearLogs: refreshData
