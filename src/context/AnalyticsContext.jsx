@@ -73,7 +73,7 @@ export function AnalyticsProvider({ children }) {
 
     const interval = setInterval(() => {
       fetchAnalyticsData();
-    }, 30000); // Refresh every 30 seconds
+    }, 1800000); // Refresh every 30 minutes (1,800,000ms)
 
     return () => clearInterval(interval);
   }, [autoRefresh]);
