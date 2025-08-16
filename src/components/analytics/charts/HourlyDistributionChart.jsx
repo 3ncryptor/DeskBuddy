@@ -1,16 +1,26 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import { useAnalytics } from '../../../context/AnalyticsContext';
 
 const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
-  const { analyticsData } = useAnalytics();
+  const { analyticsData, lastUpdated, autoRefresh } = useAnalytics();
   const [timeFrame, setTimeFrame] = useState(propTimeFrame || '60'); // Default to 60 minutes
+  const [isLive, setIsLive] = useState(true);
+  const [lastDataUpdate, setLastDataUpdate] = useState(null);
+
+  // Track when data actually changes for the chart
+  useEffect(() => {
+    if (data && data.length > 0) {
+      setLastDataUpdate(new Date());
+    }
+  }, [data]);
 
   const chartData = useMemo(() => {
-    // Use backend peak hours data if available
-    const peakHoursData = analyticsData?.peakHours;
-    
-    if (peakHoursData && peakHoursData.intervalData) {
+    try {
+      // Use backend peak hours data if available
+      const peakHoursData = analyticsData?.peakHours;
+      
+      if (peakHoursData && peakHoursData.intervalData && Object.keys(peakHoursData.intervalData).length > 0) {
       // Use backend hourly distribution data
       const allStagesData = peakHoursData.intervalData;
       const labels = allStagesData.arrival?.map(interval => interval.label) || [];
@@ -46,11 +56,11 @@ const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
         }
       });
       
-      return { labels, datasets };
-    }
-    
-    // Fallback to processing logs data
-    if (!data || data.length === 0) {
+        return { labels, datasets };
+      }
+      
+      // Fallback to processing logs data
+      if (!data || data.length === 0) {
       return {
         labels: ['No Data'],
         datasets: [{
@@ -71,20 +81,47 @@ const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
     }
 
     const timeFrameMinutes = parseInt(timeFrame);
+    if (isNaN(timeFrameMinutes) || timeFrameMinutes <= 0) {
+      return {
+        labels: ['Invalid Time Frame'],
+        datasets: [{
+          label: 'Invalid Configuration',
+          data: [0],
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          borderWidth: 2,
+          fill: false
+        }]
+      };
+    }
+
     const intervalsPerHour = 60 / timeFrameMinutes;
     
-    // Find the actual time range of the data
-    let minHour = 23, maxHour = 0;
+    // Find the actual time range of the data with better validation
+    let minHour = null, maxHour = null;
+    
     data.forEach(log => {
       try {
+        if (!log.timestamp) return;
         const date = new Date(log.timestamp);
+        if (isNaN(date.getTime())) return;
+        
         const hour = date.getHours();
-        minHour = Math.min(minHour, hour);
-        maxHour = Math.max(maxHour, hour);
-      } catch {
-        console.error('Invalid timestamp:', log.timestamp);
+        if (hour >= 0 && hour <= 23) {
+          minHour = minHour === null ? hour : Math.min(minHour, hour);
+          maxHour = maxHour === null ? hour : Math.max(maxHour, hour);
+        }
+      } catch (error) {
+        console.error('Invalid timestamp:', log.timestamp, error);
       }
     });
+
+    // If no valid data, use current time as reference
+    if (minHour === null || maxHour === null) {
+      const currentHour = new Date().getHours();
+      minHour = Math.max(0, currentHour - 6);
+      maxHour = Math.min(23, currentHour + 6);
+    }
 
     // Add some padding to the range (1 hour before and after)
     const startHour = Math.max(0, minHour - 1);
@@ -118,9 +155,14 @@ const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
     // Generate labels based on time frame for the actual range
     const labels = Object.keys(intervalData).map(intervalIndex => {
       const intervalNum = parseInt(intervalIndex);
+      if (isNaN(intervalNum)) return 'Invalid';
+      
       const totalMinutes = intervalNum * timeFrameMinutes;
       const hour = startHour + Math.floor(totalMinutes / 60);
       const minute = totalMinutes % 60;
+      
+      // Validate hour bounds
+      if (hour < 0 || hour > 23) return 'Invalid';
       
       if (timeFrameMinutes === 60) {
         // 60-minute intervals (hourly)
@@ -138,7 +180,7 @@ const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
     });
 
     const values = Object.values(intervalData);
-    const maxValue = Math.max(...values);
+    const maxValue = values.length > 0 ? Math.max(...values) : 0;
 
     // Create gradient context for the area
     const createGradient = (ctx) => {
@@ -186,6 +228,20 @@ const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
         shadowOffsetY: 2
       }]
     };
+    } catch (error) {
+      console.error('Error processing peak hours data:', error);
+      return {
+        labels: ['Error'],
+        datasets: [{
+          label: 'Error loading data',
+          data: [0],
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          borderWidth: 2,
+          fill: false
+        }]
+      };
+    }
   }, [data, timeFrame, analyticsData?.peakHours]);
 
   const options = {
@@ -274,29 +330,57 @@ const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
   };
 
   const analysis = useMemo(() => {
-    if (!data || data.length === 0) {
+    try {
+      if (!data || data.length === 0) {
+        return (
+          <div style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>
+            <p>No data available for analysis</p>
+            <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>
+              {isLive && autoRefresh ? 'Waiting for new scan data...' : 'Enable live updates to see real-time data'}
+            </p>
+          </div>
+        );
+      }
+
+    const timeFrameMinutes = parseInt(timeFrame);
+    if (isNaN(timeFrameMinutes) || timeFrameMinutes <= 0) {
+      console.error('Invalid timeFrame:', timeFrame);
       return (
-        <div style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>
-          <p>No data available for analysis</p>
+        <div style={{ padding: '1rem', textAlign: 'center', color: '#ef4444' }}>
+          <p>Invalid time frame configuration</p>
         </div>
       );
     }
 
-    const timeFrameMinutes = parseInt(timeFrame);
     const intervalsPerHour = 60 / timeFrameMinutes;
     
-    // Find the actual time range of the data
-    let minHour = 23, maxHour = 0;
+    // Find the actual time range of the data with better validation
+    let minHour = null, maxHour = null;
+    const validHours = [];
+    
     data.forEach(log => {
       try {
+        if (!log.timestamp) return;
         const date = new Date(log.timestamp);
+        if (isNaN(date.getTime())) return; // Invalid date
+        
         const hour = date.getHours();
-        minHour = Math.min(minHour, hour);
-        maxHour = Math.max(maxHour, hour);
-      } catch {
-        console.error('Invalid timestamp:', log.timestamp);
+        if (hour >= 0 && hour <= 23) {
+          validHours.push(hour);
+          minHour = minHour === null ? hour : Math.min(minHour, hour);
+          maxHour = maxHour === null ? hour : Math.max(maxHour, hour);
+        }
+      } catch (error) {
+        console.error('Invalid timestamp:', log.timestamp, error);
       }
     });
+
+    // If no valid data, use current time as reference
+    if (minHour === null || maxHour === null || validHours.length === 0) {
+      const currentHour = new Date().getHours();
+      minHour = Math.max(0, currentHour - 6); // Show 6 hours before current
+      maxHour = Math.min(23, currentHour + 6); // Show 6 hours after current
+    }
 
     // Add some padding to the range (1 hour before and after)
     const startHour = Math.max(0, minHour - 1);
@@ -328,15 +412,22 @@ const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
 
     const values = Object.values(intervalData);
     const total = values.reduce((a, b) => a + b, 0);
-    const maxScans = Math.max(...values);
-    const peakInterval = Object.keys(intervalData).find(interval => intervalData[interval] === maxScans);
+    const maxScans = values.length > 0 ? Math.max(...values) : 0;
+    const peakInterval = maxScans > 0 ? Object.keys(intervalData).find(interval => intervalData[interval] === maxScans) : '0';
     
     // Convert peak interval to readable format
     const getReadableTime = (intervalIndex) => {
+      if (!intervalIndex || intervalIndex === 'undefined') return 'N/A';
+      
       const intervalNum = parseInt(intervalIndex);
+      if (isNaN(intervalNum)) return 'N/A';
+      
       const totalMinutes = intervalNum * timeFrameMinutes;
       const hour = startHour + Math.floor(totalMinutes / 60);
       const minute = totalMinutes % 60;
+      
+      // Validate hour is within bounds
+      if (hour < 0 || hour > 23) return 'N/A';
       
       if (timeFrameMinutes === 60) {
         if (hour === 0) return '12 AM';
@@ -388,27 +479,70 @@ const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
       period.count > max.count ? period : max
     );
 
-    // Get time range display
+    // Get time range display with validation
     const getTimeRangeDisplay = () => {
-      const startDisplay = startHour === 0 ? '12 AM' : startHour === 12 ? '12 PM' : startHour > 12 ? `${startHour - 12} PM` : `${startHour} AM`;
-      const endDisplay = endHour === 0 ? '12 AM' : endHour === 12 ? '12 PM' : endHour > 12 ? `${endHour - 12} PM` : `${endHour} AM`;
+      if (startHour < 0 || startHour > 23 || endHour < 0 || endHour > 23) {
+        return 'Invalid time range';
+      }
+      
+      const formatHour = (hour) => {
+        if (hour === 0) return '12 AM';
+        if (hour === 12) return '12 PM';
+        if (hour > 12) return `${hour - 12} PM`;
+        return `${hour} AM`;
+      };
+      
+      const startDisplay = formatHour(startHour);
+      const endDisplay = formatHour(endHour);
       return `${startDisplay} - ${endDisplay}`;
     };
+
+    // Validate and fix potential calculation issues
+    const safeTotal = total || 0;
+    const safeTotalIntervals = totalIntervals > 0 ? totalIntervals : 1;
+    const safeAverage = safeTotalIntervals > 0 ? (safeTotal / safeTotalIntervals).toFixed(1) : '0.0';
 
     return (
       <div style={{ padding: '1rem', fontSize: '0.9rem', lineHeight: '1.6', color: '#1e293b' }}>
         <p><strong>Time Range:</strong> {getTimeRangeDisplay()}</p>
-        <p><strong>Peak Time:</strong> {getReadableTime(peakInterval)} ({maxScans} scans)</p>
-        <p><strong>Busiest Period:</strong> {busiestPeriod.name} ({busiestPeriod.count} scans)</p>
-        <p><strong>Total Scans:</strong> {total}</p>
-        <p><strong>Average per {timeFrame}-min interval:</strong> {(total / totalIntervals).toFixed(1)} scans</p>
+        <p><strong>Peak Time:</strong> {getReadableTime(peakInterval)} ({maxScans || 0} scans)</p>
+        <p><strong>Busiest Period:</strong> {busiestPeriod?.name || 'No data'} ({busiestPeriod?.count || 0} scans)</p>
+        <p><strong>Total Scans:</strong> {safeTotal}</p>
+        <p><strong>Average per {timeFrame}-min interval:</strong> {safeAverage} scans</p>
         <p><strong>Insight:</strong> {timeFrame}-minute intervals help identify precise peak arrival times for optimal staffing.</p>
+        {safeTotal === 0 && (
+          <p style={{ marginTop: '0.5rem', fontStyle: 'italic', color: '#64748b' }}>
+            {isLive && autoRefresh ? 'Waiting for scan data to populate analysis...' : 'No scan data available for analysis'}
+          </p>
+        )}
       </div>
     );
-  }, [data, timeFrame]);
+    } catch (error) {
+      console.error('Error generating analysis:', error);
+      return (
+        <div style={{ padding: '1rem', textAlign: 'center', color: '#ef4444' }}>
+          <p>Error generating analysis</p>
+          <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>
+            Please try refreshing the data or contact support if the issue persists.
+          </p>
+        </div>
+      );
+    }
+  }, [data, timeFrame, isLive, autoRefresh]);
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* CSS for pulse animation */}
+      <style>
+        {`
+          @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+          }
+        `}
+      </style>
+      
       {/* Time Frame Selector */}
       <div style={{ 
         padding: '1rem', 
@@ -440,10 +574,45 @@ const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
           }}
         >
           <option value="60">60 minutes</option>
-          <option value="45">45 minutes</option>
           <option value="30">30 minutes</option>
           <option value="15">15 minutes</option>
+          <option value="10">10 minutes</option>
+          <option value="5">5 minutes</option>
         </select>
+        
+        {/* Live Status Indicator */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '0.5rem',
+          marginLeft: 'auto'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.25rem',
+            fontSize: '0.8rem',
+            color: isLive && autoRefresh ? '#10b981' : '#64748b'
+          }}>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: isLive && autoRefresh ? '#10b981' : '#64748b',
+              animation: isLive && autoRefresh ? 'pulse 2s infinite' : 'none'
+            }} />
+            {isLive && autoRefresh ? 'LIVE' : 'PAUSED'}
+          </div>
+          {lastUpdated && (
+            <div style={{ 
+              fontSize: '0.75rem', 
+              color: '#64748b',
+              whiteSpace: 'nowrap'
+            }}>
+              Updated: {lastUpdated.toLocaleTimeString()}
+            </div>
+          )}
+        </div>
       </div>
       
       <div style={{ 
