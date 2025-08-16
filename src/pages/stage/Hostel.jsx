@@ -23,9 +23,9 @@ const HostelPage = () => {
                 Back to Dashboard
               </button>
               <div className="page-info">
-                <h1 className="page-title">Hostel Verification</h1>
+                <h1 className="page-title">Attandance Verification</h1>
                 <p className="page-description">
-                  Verify hostel assignments and manage room allocations
+                  Verify Attandance for Self and Society Class
                 </p>
               </div>
             </div>
@@ -41,7 +41,7 @@ const HostelPage = () => {
               <div className="card-content">
                 <h3 className="card-title">Scan QR Code</h3>
                 <p className="card-description">
-                  Scan student QR codes to verify hostel assignments
+                  Scan student QR codes to verify Attandance
                 </p>
               </div>
               <div className="card-action">
@@ -59,7 +59,7 @@ const HostelPage = () => {
               <div className="card-content">
                 <h3 className="card-title">View History</h3>
                 <p className="card-description">
-                  Access hostel verification records and history
+                  Access Attandance records and history
                 </p>
                 <span className="coming-soon">Coming Soon</span>
               </div>

@@ -9,12 +9,12 @@ import { useToast } from './ToastProvider';
 
 const navLinks = [
   { to: '/dashboard', label: 'Dashboard', icon: <MdDashboard /> },
-  { to: '/arrival', label: 'Arrival', icon: <FiCheckSquare /> },
+  // { to: '/arrival', label: 'Arrival', icon: <FiCheckSquare /> },
   { to: '/hostel', label: 'Hostel', icon: <MdHotel /> },
-  { to: '/documents', label: 'Documents', icon: <FiFileText /> },
-  { to: '/kit', label: 'Kit', icon: <MdInventory2 /> },
+  // { to: '/documents', label: 'Documents', icon: <FiFileText /> },
+  // { to: '/kit', label: 'Kit', icon: <MdInventory2 /> },
   { to: '/sendqr', label: 'Send QR', icon: <FiSend /> },
-  { to: '/analytics', label: 'Analytics', icon: <MdAssignment /> },
+  // { to: '/analytics', label: 'Analytics', icon: <MdAssignment /> },
 ];
 
 export default function NewSidebar({ onCollapseChange, mobileOpen, setMobileOpen }) {

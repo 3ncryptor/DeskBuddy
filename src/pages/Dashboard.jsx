@@ -23,34 +23,34 @@ const Dashboard = () => {
   const userName = getUserName();
 
   const cards = [
+    // { 
+    //   label: "Arrival Check-In", 
+    //   route: "/arrival", 
+    //   color: "var(--success-color)", 
+    //   svg: ArrivalPNG,
+    //   description: "Process student arrivals and initial check-ins"
+    // },
     { 
-      label: "Arrival Check-In", 
-      route: "/arrival", 
-      color: "var(--success-color)", 
-      svg: ArrivalPNG,
-      description: "Process student arrivals and initial check-ins"
-    },
-    { 
-      label: "Hostel Verification", 
+      label: "Attandance", 
       route: "/hostel", 
       color: "var(--primary-color)", 
       svg: HostelScanPNG,
-      description: "Verify hostel assignments and room allocations"
+      description: "Verify Attandance for Self and Society Class"
     },
-    { 
-      label: "Document Verification", 
-      route: "/documents", 
-      color: "var(--accent-color)", 
-      svg: DocumentScanPNG,
-      description: "Review and validate student documents"
-    },
-    { 
-      label: "Orientation Kit", 
-      route: "/kit", 
-      color: "var(--secondary-color)", 
-      svg: ArrivalPNG,
-      description: "Distribute orientation materials and kits"
-    },
+    // { 
+    //   label: "Document Verification", 
+    //   route: "/documents", 
+    //   color: "var(--accent-color)", 
+    //   svg: DocumentScanPNG,
+    //   description: "Review and validate student documents"
+    // },
+    // { 
+    //   label: "Orientation Kit", 
+    //   route: "/kit", 
+    //   color: "var(--secondary-color)", 
+    //   svg: ArrivalPNG,
+    //   description: "Distribute orientation materials and kits"
+    // },
     { 
       label: "Send QR to Student", 
       route: "/sendqr",
@@ -58,13 +58,13 @@ const Dashboard = () => {
       svg: ScanQR,
       description: "Generate and send QR codes to students"
     },
-    {
-      label: "Analytics",
-      route: "/analytics",
-      color: "var(--info-color)",
-      svg: DocumentScanPNG,
-      description: "View scan analytics and volunteer stats"
-    },
+    // {
+    //   label: "Analytics",
+    //   route: "/analytics",
+    //   color: "var(--info-color)",
+    //   svg: DocumentScanPNG,
+    //   description: "View scan analytics and volunteer stats"
+    // },
   ];
 
   return (
