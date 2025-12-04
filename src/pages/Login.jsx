@@ -7,6 +7,7 @@ import {
 } from "firebase/auth";
 import { auth, provider } from "../services/firebase";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "../styles/Login.css";
 import { useToast } from '../components/ToastProvider';
 import VideoBackground from '../components/VideoBackground';
@@ -45,6 +46,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const { loginWithJWT, registerWithJWT } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -57,7 +59,7 @@ const Login = () => {
       await signInWithPopup(auth, provider);
       addToast({ type: 'success', title: 'Login Successful', duration: 3500 });
       navigate('/dashboard');
-    } catch (error) {
+    } catch {
       setError('Google login failed. Please try again or use email login.');
       addToast({ type: 'error', title: 'Google login failed', message: 'Please try again or use email login.', duration: 3500 });
     } finally {
@@ -74,9 +76,18 @@ const Login = () => {
     }
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      addToast({ type: 'success', title: 'Login Successful', duration: 3500 });
-      navigate('/dashboard');
+      // Try JWT authentication first, fallback to Firebase
+      try {
+        await loginWithJWT(formData.email, formData.password);
+        addToast({ type: 'success', title: 'Login Successful', duration: 3500 });
+        navigate('/dashboard');
+      } catch (jwtError) {
+        console.log('JWT login failed, trying Firebase:', jwtError.message);
+        // Fallback to Firebase authentication
+        await signInWithEmailAndPassword(auth, formData.email, formData.password);
+        addToast({ type: 'success', title: 'Login Successful', duration: 3500 });
+        navigate('/dashboard');
+      }
     } catch {
       setError('Login failed. Please check your email and password and try again.');
       addToast({ type: 'error', title: 'Login failed', message: 'Please check your email and password and try again.', duration: 3500 });
@@ -99,12 +110,21 @@ const Login = () => {
     }
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      // Use JWT authentication for new registrations
+      await registerWithJWT(formData.name, formData.email, formData.password);
       addToast({ type: 'success', title: 'Account Created', duration: 3500 });
       navigate('/dashboard');
-    } catch {
-      setError('Signup failed. Please check your details and try again. If the problem persists, contact support.');
-      addToast({ type: 'error', title: 'Signup failed', message: 'Please check your details and try again. If the problem persists, contact support.', duration: 3500 });
+    } catch (jwtError) {
+      console.log('JWT signup failed, trying Firebase:', jwtError.message);
+      try {
+        // Fallback to Firebase authentication
+        await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        addToast({ type: 'success', title: 'Account Created', duration: 3500 });
+        navigate('/dashboard');
+      } catch {
+        setError('Signup failed. Please check your details and try again. If the problem persists, contact support.');
+        addToast({ type: 'error', title: 'Signup failed', message: 'Please check your details and try again. If the problem persists, contact support.', duration: 3500 });
+      }
     } finally {
       setIsLoading(false);
     }
