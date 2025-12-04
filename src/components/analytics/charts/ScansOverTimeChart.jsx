@@ -38,18 +38,32 @@ const ScansOverTimeChart = ({ data }) => {
     return {
       labels: sortedDates,
       datasets: [{
-        label: 'Scans Over Time',
+        label: 'Daily Scan Activity',
         data: sortedDates.map(date => timeData[date]),
-        borderColor: '#667eea',
-        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+        borderColor: 'rgba(245, 158, 11, 1)',
+        backgroundColor: (context) => {
+          const chart = context.chart;
+          const {ctx, chartArea} = chart;
+          if (!chartArea) return null;
+          
+          const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          gradient.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
+          gradient.addColorStop(1, 'rgba(245, 158, 11, 0.05)');
+          return gradient;
+        },
         borderWidth: 3,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#667eea',
-        pointBorderColor: 'white',
-        pointBorderWidth: 2,
-        pointRadius: 6,
+        pointBackgroundColor: 'rgba(245, 158, 11, 1)',
+        pointBorderColor: 'rgba(255, 255, 255, 1)',
+        pointBorderWidth: 3,
+        pointRadius: 5,
         pointHoverRadius: 8,
+        pointHoverBackgroundColor: 'rgba(245, 158, 11, 1)',
+        pointHoverBorderColor: 'rgba(255, 255, 255, 1)',
+        pointHoverBorderWidth: 4,
+        shadowColor: 'rgba(245, 158, 11, 0.3)',
+        shadowBlur: 10
       }]
     };
   }, [data]);
@@ -176,20 +190,15 @@ const ScansOverTimeChart = ({ data }) => {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        // 3D container effects
-        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+        background: 'rgba(255, 255, 255, 0.4)',
         borderRadius: '16px',
-        boxShadow: `
-          0 8px 32px rgba(0, 0, 0, 0.1),
-          0 4px 16px rgba(0, 0, 0, 0.05),
-          inset 0 1px 0 rgba(255, 255, 255, 0.2)
-        `,
-        border: '1px solid rgba(255, 255, 255, 0.2)',
+        border: '1px solid rgba(255, 255, 255, 0.6)',
         backdropFilter: 'blur(8px)',
         position: 'relative',
-        padding: '1rem'
+        padding: '1.5rem',
+        transition: 'all 0.3s ease'
       }}>
-        {/* 3D inner glow effect */}
+        {/* Enhanced glow effect */}
         <div style={{
           position: 'absolute',
           top: '0',
@@ -197,8 +206,9 @@ const ScansOverTimeChart = ({ data }) => {
           right: '0',
           bottom: '0',
           borderRadius: '16px',
-          background: 'radial-gradient(circle at 70% 30%, rgba(102, 126, 234, 0.1) 0%, transparent 50%)',
-          pointerEvents: 'none'
+          background: 'radial-gradient(circle at 70% 30%, rgba(245, 158, 11, 0.08) 0%, transparent 60%)',
+          pointerEvents: 'none',
+          opacity: 0.9
         }} />
         <Line data={chartData} options={options} />
       </div>

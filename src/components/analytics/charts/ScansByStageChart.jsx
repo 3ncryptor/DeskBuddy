@@ -23,8 +23,17 @@ const ScansByStageChart = ({ data }) => {
     });
     
     const colors = [
-      '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6',
-      '#ef4444', '#06b6d4', '#84cc16', '#f97316'
+      'rgba(59, 130, 246, 0.9)', 'rgba(245, 158, 11, 0.9)', 
+      'rgba(16, 185, 129, 0.9)', 'rgba(139, 92, 246, 0.9)',
+      'rgba(239, 68, 68, 0.9)', 'rgba(6, 182, 212, 0.9)', 
+      'rgba(132, 204, 22, 0.9)', 'rgba(249, 115, 22, 0.9)'
+    ];
+    
+    const hoverColors = [
+      'rgba(59, 130, 246, 1)', 'rgba(245, 158, 11, 1)', 
+      'rgba(16, 185, 129, 1)', 'rgba(139, 92, 246, 1)',
+      'rgba(239, 68, 68, 1)', 'rgba(6, 182, 212, 1)', 
+      'rgba(132, 204, 22, 1)', 'rgba(249, 115, 22, 1)'
     ];
     
     return {
@@ -32,9 +41,12 @@ const ScansByStageChart = ({ data }) => {
       datasets: [{
         data: Object.values(stageCounts),
         backgroundColor: colors.slice(0, Object.keys(stageCounts).length),
+        hoverBackgroundColor: hoverColors.slice(0, Object.keys(stageCounts).length),
         borderWidth: 3,
-        borderColor: 'rgba(255, 255, 255, 0.2)',
-        hoverOffset: 8,
+        borderColor: 'rgba(255, 255, 255, 0.8)',
+        hoverBorderColor: 'rgba(255, 255, 255, 1)',
+        hoverOffset: 12,
+        spacing: 2
       }]
     };
   }, [data]);
@@ -42,6 +54,16 @@ const ScansByStageChart = ({ data }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      animateRotate: true,
+      animateScale: true,
+      duration: 2000,
+      easing: 'easeInOutCubic'
+    },
+    interaction: {
+      intersect: false,
+      mode: 'nearest'
+    },
     plugins: {
       legend: {
         position: 'bottom',
@@ -49,45 +71,85 @@ const ScansByStageChart = ({ data }) => {
           color: '#1e293b',
           padding: 20,
           usePointStyle: true,
-          font: { size: 12 }
+          font: { 
+            size: 12,
+            family: 'Inter, system-ui, sans-serif',
+            weight: '500'
+          },
+          generateLabels: function(chart) {
+            const data = chart.data;
+            if (data.labels.length && data.datasets.length) {
+              return data.labels.map((label, i) => {
+                const dataset = data.datasets[0];
+                const value = dataset.data[i];
+                const total = dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return {
+                  text: `${label} (${percentage}%)`,
+                  fillStyle: dataset.backgroundColor[i],
+                  strokeStyle: dataset.borderColor,
+                  lineWidth: dataset.borderWidth,
+                  pointStyle: 'circle',
+                  hidden: false,
+                  index: i
+                };
+              });
+            }
+            return [];
+          }
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backgroundColor: 'rgba(255, 255, 255, 0.98)',
         titleColor: '#1e293b',
         bodyColor: '#1e293b',
-        borderColor: 'rgba(0, 0, 0, 0.1)',
-        borderWidth: 1,
-        cornerRadius: 8,
+        borderColor: 'rgba(59, 130, 246, 0.3)',
+        borderWidth: 2,
+        cornerRadius: 12,
         displayColors: true,
+        padding: 16,
+        titleFont: {
+          size: 14,
+          weight: '600'
+        },
+        bodyFont: {
+          size: 13,
+          weight: '500'
+        },
         callbacks: {
+          title: function(context) {
+            return context[0].label;
+          },
           label: function(context) {
             const total = context.dataset.data.reduce((a, b) => a + b, 0);
             const percentage = ((context.parsed / total) * 100).toFixed(1);
-            return `${context.label}: ${context.parsed} (${percentage}%)`;
+            return [`Scans: ${context.parsed}`, `Percentage: ${percentage}%`];
           }
         },
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-        backdropFilter: 'blur(8px)'
+        filter: function(tooltipItem) {
+          return tooltipItem.parsed > 0;
+        }
       }
     },
-    cutout: '60%',
+    cutout: '65%',
+    radius: '90%',
     elements: {
       arc: {
-        borderWidth: 4,
-        borderColor: 'rgba(255, 255, 255, 0.3)',
-        shadowColor: 'rgba(0, 0, 0, 0.3)',
-        shadowBlur: 8,
-        shadowOffsetX: 2,
-        shadowOffsetY: 2
+        borderWidth: 3,
+        borderColor: 'rgba(255, 255, 255, 0.8)',
+        hoverBorderWidth: 4,
+        hoverBorderColor: 'rgba(255, 255, 255, 1)'
       }
+    },
+    onHover: (event, activeElements, chart) => {
+      event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
     },
     layout: {
       padding: {
-        top: 20,
-        right: 20,
-        bottom: 20,
-        left: 20
+        top: 10,
+        right: 10,
+        bottom: 10,
+        left: 10
       }
     }
   };
@@ -131,18 +193,13 @@ const ScansByStageChart = ({ data }) => {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        // 3D container effects
-        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+        background: 'rgba(255, 255, 255, 0.4)',
         borderRadius: '16px',
-        boxShadow: `
-          0 8px 32px rgba(0, 0, 0, 0.1),
-          0 4px 16px rgba(0, 0, 0, 0.05),
-          inset 0 1px 0 rgba(255, 255, 255, 0.2)
-        `,
-        border: '1px solid rgba(255, 255, 255, 0.2)',
+        border: '1px solid rgba(255, 255, 255, 0.6)',
         backdropFilter: 'blur(8px)',
         position: 'relative',
-        padding: '1rem'
+        padding: '1.5rem',
+        transition: 'all 0.3s ease'
       }}>
         {/* 3D inner glow effect */}
         <div style={{

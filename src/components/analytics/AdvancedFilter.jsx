@@ -11,8 +11,6 @@ const AdvancedFilter = ({
   stages,
   volunteers 
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   const activeFiltersCount = [
     searchTerm && 1,
     selectedStage !== 'all' && 1,
@@ -20,139 +18,74 @@ const AdvancedFilter = ({
   ].filter(Boolean).length;
 
   return (
-    <div className="advanced-filter-container">
-      <div className="filter-header" onClick={() => setIsExpanded(!isExpanded)}>
-        <div className="filter-toggle">
-          <svg 
-            className={`filter-icon ${isExpanded ? 'expanded' : ''}`}
-            width="20" 
-            height="20" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2"
-          >
-            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46 22,3"/>
+    <div className="compact-filters">
+      {/* Quick Search */}
+      <div className="filter-item">
+        <div className="search-box">
+          <svg className="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
           </svg>
-          <span>Advanced Filters</span>
-          {activeFiltersCount > 0 && (
-            <span className="filter-count">{activeFiltersCount}</span>
-          )}
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search students, volunteers..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
         </div>
       </div>
 
-      <div className={`filter-content ${isExpanded ? 'expanded' : ''}`}>
-        <div className="filter-grid">
-          {/* Search Bar */}
-          <div className="filter-group">
-            <label className="filter-label">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"/>
-                <path d="m21 21-4.35-4.35"/>
-              </svg>
-              Search
-            </label>
-            <input
-              type="text"
-              className="filter-input"
-              placeholder="Search by name, ID, volunteer..."
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
-
-          {/* Stage Filter */}
-          <div className="filter-group">
-            <label className="filter-label">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/>
-                <circle cx="7" cy="7" r="1"/>
-              </svg>
-              Stage
-            </label>
-            <div className="select-wrapper">
-              <select
-                className="filter-select"
-                value={selectedStage}
-                onChange={(e) => onStageChange(e.target.value)}
-              >
-                {stages.map(stage => (
-                  <option key={stage} value={stage}>
-                    {stage === 'all' ? 'All Stages' : stage}
-                  </option>
-                ))}
-              </select>
-              <div className="select-arrow">▼</div>
-            </div>
-          </div>
-
-          {/* Volunteer Filter */}
-          <div className="filter-group">
-            <label className="filter-label">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="m23 21-2-2"/>
-                <path d="m16 16 4 4 4-4"/>
-              </svg>
-              Volunteer
-            </label>
-            <div className="select-wrapper">
-              <select
-                className="filter-select"
-                value={selectedVolunteer}
-                onChange={(e) => onVolunteerChange(e.target.value)}
-              >
-                {volunteers.map(volunteer => (
-                  <option key={volunteer} value={volunteer}>
-                    {volunteer === 'all' ? 'All Volunteers' : volunteer}
-                  </option>
-                ))}
-              </select>
-              <div className="select-arrow">▼</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Active Filters Display */}
-        {activeFiltersCount > 0 && (
-          <div className="active-filters">
-            {searchTerm && (
-              <span className="filter-chip">
-                Search: {searchTerm}
-                <button 
-                  className="chip-remove"
-                  onClick={() => onSearchChange('')}
-                >
-                  ×
-                </button>
-              </span>
-            )}
-            {selectedStage !== 'all' && (
-              <span className="filter-chip">
-                Stage: {selectedStage}
-                <button 
-                  className="chip-remove"
-                  onClick={() => onStageChange('all')}
-                >
-                  ×
-                </button>
-              </span>
-            )}
-            {selectedVolunteer !== 'all' && (
-              <span className="filter-chip">
-                Volunteer: {selectedVolunteer}
-                <button 
-                  className="chip-remove"
-                  onClick={() => onVolunteerChange('all')}
-                >
-                  ×
-                </button>
-              </span>
-            )}
-          </div>
-        )}
+      {/* Stage Filter */}
+      <div className="filter-item">
+        <select
+          className="filter-select"
+          value={selectedStage}
+          onChange={(e) => onStageChange(e.target.value)}
+        >
+          {stages.map(stage => (
+            <option key={stage} value={stage}>
+              {stage === 'all' ? 'All Stages' : stage.charAt(0).toUpperCase() + stage.slice(1)}
+            </option>
+          ))}
+        </select>
       </div>
+
+      {/* Volunteer Filter */}
+      <div className="filter-item">
+        <select
+          className="filter-select"
+          value={selectedVolunteer}
+          onChange={(e) => onVolunteerChange(e.target.value)}
+        >
+          {volunteers.map(volunteer => (
+            <option key={volunteer} value={volunteer}>
+              {volunteer === 'all' ? 'All Volunteers' : volunteer}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Active Filters Count */}
+      {activeFiltersCount > 0 && (
+        <div className="filters-badge">
+          <span className="badge-text">{activeFiltersCount} Active</span>
+          <button 
+            className="clear-filters"
+            onClick={() => {
+              onSearchChange('');
+              onStageChange('all');
+              onVolunteerChange('all');
+            }}
+            title="Clear all filters"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

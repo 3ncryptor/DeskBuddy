@@ -14,7 +14,7 @@ const SendQR = () => {
   const [fileName, setFileName] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
   const { addToast } = useToast();
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002';
 
   // Capitalize each word in the name
   const capitalizeName = (name) =>

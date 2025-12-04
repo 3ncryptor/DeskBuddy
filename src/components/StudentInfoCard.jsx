@@ -7,25 +7,45 @@ const stageLabels = {
     label: "Arrival",
     statusKey: "arrival",
     verifiedByKey: "arrivalVerifiedBy",
-    icon: "🏠",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+      </svg>
+    ),
   },
   hostel: {
     label: "Hostel",
     statusKey: "hostelVerified",
     verifiedByKey: "hostelVerifiedBy",
-    icon: "🏢",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+      </svg>
+    ),
   },
   documents: {
     label: "Documents",
     statusKey: "documentsVerified",
     verifiedByKey: "documentsVerifiedBy",
-    icon: "📄",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+      </svg>
+    ),
   },
   kit: {
     label: "Kit",
     statusKey: "kitReceived",
     verifiedByKey: "kitReceivedBy",
-    icon: "📦",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73L12 2 4 6.27A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73L12 22l8-4.27A2 2 0 0 0 21 16z" />
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+      </svg>
+    ),
   },
 };
 
@@ -90,7 +110,11 @@ const StudentInfoCard = ({ student, currentStage }) => {
               alt="Student Avatar"
               className="student-avatar big"
             />
-            <div className="avatar-status neutral">⏳</div>
+            <div className="avatar-status neutral">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 2h12M6 22h12M6 2v6a6 6 0 0 0 6 6v6M18 2v6a6 6 0 0 1-6 6"/>
+              </svg>
+            </div>
           </div>
           <div className="student-header-info">
             <span className="student-name big">No Student Data</span>
@@ -129,11 +153,21 @@ const StudentInfoCard = ({ student, currentStage }) => {
                 : "pending"
             }`}
           >
-            {completionPercentage === 100
-              ? "✅"
-              : completionPercentage >= 50
-              ? "🔄"
-              : "⏳"}
+            {completionPercentage === 100 ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            ) : completionPercentage >= 50 ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="23 4 23 10 17 10" />
+                <polyline points="1 20 1 14 7 14" />
+                <path d="M3 7a9 9 0 0 0 18 0" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 2h12M6 22h12M6 2v6a6 6 0 0 0 6 6v6M18 2v6a6 6 0 0 1-6 6"/>
+              </svg>
+            )}
           </div>
         </div>
         <div className="student-header-info">
@@ -204,7 +238,21 @@ const StudentInfoCard = ({ student, currentStage }) => {
                 status.completed ? "yes" : "no"
               }`}
             >
-              {status.completed ? "✅ Completed" : "⏳ Pending"}
+              {status.completed ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Completed
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
+                    <path d="M6 2h12M6 22h12M6 2v6a6 6 0 0 0 6 6v6M18 2v6a6 6 0 0 1-6 6"/>
+                  </svg>
+                  Pending
+                </>
+              )}
             </span>
             <span className="scan-status-by">
               {status.completed
@@ -231,7 +279,21 @@ const StudentInfoCard = ({ student, currentStage }) => {
                 <span className="stage-icon">{stageInfo.icon}</span>
                 <span className="stage-name">{stageInfo.label}</span>
                 <span className="stage-status">
-                  {isCompleted ? "✅" : isCurrent ? "🔄" : "⏳"}
+                  {isCompleted ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : isCurrent ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="23 4 23 10 17 10" />
+                      <polyline points="1 20 1 14 7 14" />
+                      <path d="M3 7a9 9 0 0 0 18 0" />
+                    </svg>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M6 2h12M6 22h12M6 2v6a6 6 0 0 0 6 6v6M18 2v6a6 6 0 0 1-6 6"/>
+                    </svg>
+                  )}
                 </span>
               </div>
             );

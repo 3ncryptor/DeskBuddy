@@ -2,8 +2,10 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const AnalyticsContext = createContext();
 
-// Backend API base URL
-const API_BASE_URL = 'https://deskbuddy.codesetu.in/api/analytics';
+// Backend API base URL - Use environment variable or fallback to localhost
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL 
+  ? `${import.meta.env.VITE_API_BASE_URL}/api/analytics`
+  : 'http://localhost:3002/api/analytics';
 
 export function AnalyticsProvider({ children }) {
   const [analyticsData, setAnalyticsData] = useState({
@@ -25,25 +27,34 @@ export function AnalyticsProvider({ children }) {
       setLoading(true);
       setError(null);
 
-      // Fetch all analytics endpoints in parallel
-      const [summaryRes, pendingRes, volunteerRes, peakHoursRes, stageTimingRes, studentJourneysRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/summary`),
-        fetch(`${API_BASE_URL}/pending-counts`),
-        fetch(`${API_BASE_URL}/volunteer-stats`),
-        fetch(`${API_BASE_URL}/peak-hours`),
-        fetch(`${API_BASE_URL}/stage-timing`),
-        fetch(`${API_BASE_URL}/student-journey`)
+      console.log('Fetching analytics from:', API_BASE_URL);
+
+      // Fetch all analytics endpoints in parallel with proper error handling
+      const fetchWithErrorHandling = async (url) => {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status} for ${url}`);
+        }
+        return response.json();
+      };
+
+      const [summary, pendingCounts, volunteerStats, peakHours, stageTiming, studentJourneys] = await Promise.all([
+        fetchWithErrorHandling(`${API_BASE_URL}/summary`),
+        fetchWithErrorHandling(`${API_BASE_URL}/pending-counts`),
+        fetchWithErrorHandling(`${API_BASE_URL}/volunteer-stats`),
+        fetchWithErrorHandling(`${API_BASE_URL}/peak-hours`),
+        fetchWithErrorHandling(`${API_BASE_URL}/stage-timing`),
+        fetchWithErrorHandling(`${API_BASE_URL}/student-journey`)
       ]);
 
-      // Parse responses
-      const [summary, pendingCounts, volunteerStats, peakHours, stageTiming, studentJourneys] = await Promise.all([
-        summaryRes.json(),
-        pendingRes.json(),
-        volunteerRes.json(),
-        peakHoursRes.json(),
-        stageTimingRes.json(),
-        studentJourneysRes.json()
-      ]);
+      console.log('Analytics data fetched successfully:', {
+        summary: !!summary,
+        pendingCounts: !!pendingCounts,
+        volunteerStats: !!volunteerStats,
+        peakHours: !!peakHours,
+        stageTiming: !!stageTiming,
+        studentJourneys: !!studentJourneys
+      });
 
       setAnalyticsData({
         summary,
@@ -56,7 +67,17 @@ export function AnalyticsProvider({ children }) {
       setLastUpdated(new Date());
     } catch (error) {
       console.error('Error fetching analytics data:', error);
-      setError(error.message);
+      setError(`Failed to load analytics: ${error.message}`);
+      
+      // Set empty data structure to prevent crashes
+      setAnalyticsData({
+        summary: null,
+        pendingCounts: null,
+        volunteerStats: null,
+        peakHours: null,
+        stageTiming: null,
+        studentJourneys: []
+      });
     } finally {
       setLoading(false);
     }

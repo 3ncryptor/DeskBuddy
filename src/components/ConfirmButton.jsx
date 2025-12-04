@@ -9,7 +9,7 @@ const ConfirmButton = ({ studentId, stage, onReset, studentData }) => {
   const { user } = useAuth();
   const volunteerName = user?.displayName || "Anonymous";
   const { addToast } = useToast();
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002';
 
   const [showVisitorModal, setShowVisitorModal] = useState(false);
   const [showLanyardPreview, setShowLanyardPreview] = useState(false);
@@ -172,9 +172,16 @@ const ConfirmButton = ({ studentId, stage, onReset, studentData }) => {
         onClick={handleConfirm}
         disabled={loading}
       >
-        {loading
-          ? "Confirming..."
-          : `✅ Confirm ${stage.charAt(0).toUpperCase() + stage.slice(1)}`}
+        {loading ? (
+          "Confirming..."
+        ) : (
+          <>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 8 }}>
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            {`Confirm ${stage.charAt(0).toUpperCase() + stage.slice(1)}`}
+          </>
+        )}
       </button>
 
       {/* Visitor Count Modal */}

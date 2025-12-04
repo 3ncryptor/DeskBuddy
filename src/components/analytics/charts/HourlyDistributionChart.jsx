@@ -634,7 +634,7 @@ const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
         backdropFilter: 'blur(8px)',
         position: 'relative'
       }}>
-        {/* 3D inner glow effect */}
+        {/* Enhanced glow effect */}
         <div style={{
           position: 'absolute',
           top: '0',
@@ -642,8 +642,9 @@ const HourlyDistributionChart = ({ data, timeFrame: propTimeFrame }) => {
           right: '0',
           bottom: '0',
           borderRadius: '16px',
-          background: 'radial-gradient(circle at 30% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%)',
-          pointerEvents: 'none'
+          background: 'radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%)',
+          pointerEvents: 'none',
+          opacity: 0.9
         }} />
         <Line data={chartData} options={options} />
       </div>

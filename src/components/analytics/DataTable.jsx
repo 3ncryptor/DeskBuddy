@@ -48,7 +48,7 @@ const DataTable = ({ data, searchTerm, onSearchChange, showAllData, onShowAllDat
         try {
           setLoadingStates(prev => new Set(prev).add(studentId));
           
-          const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+          const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002';
           const response = await fetch(`${API_BASE_URL}/api/student/${studentId}`);
           
           if (!response.ok) {

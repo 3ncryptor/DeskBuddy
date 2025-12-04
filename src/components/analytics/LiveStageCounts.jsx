@@ -39,7 +39,11 @@ const LiveStageCounts = ({ analyticsData, autoRefresh, lastUpdated }) => {
     {
       key: 'notStarted',
       label: 'Not Started',
-      icon: '⏳',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M6 2v6l4 2-4 2v6h12v-6l-4-2 4-2V2" />
+        </svg>
+      ),
       color: '#6b7280',
       description: 'Students yet to arrive',
       type: 'pending',
@@ -48,7 +52,12 @@ const LiveStageCounts = ({ analyticsData, autoRefresh, lastUpdated }) => {
     {
       key: 'arrival',
       label: 'Arrival Passed',
-      icon: '🚪',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+          <path d="M10 11v6"/>
+        </svg>
+      ),
       color: '#3b82f6',
       description: 'Students who completed arrival',
       type: 'completed',
@@ -57,7 +66,12 @@ const LiveStageCounts = ({ analyticsData, autoRefresh, lastUpdated }) => {
     {
       key: 'hostel',
       label: 'Hostel Passed',
-      icon: '🏠',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+      ),
       color: '#8b5cf6',
       description: 'Students who completed hostel verification',
       type: 'completed',
@@ -66,7 +80,12 @@ const LiveStageCounts = ({ analyticsData, autoRefresh, lastUpdated }) => {
     {
       key: 'documents',
       label: 'Documents Passed',
-      icon: '📄',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      ),
       color: '#f59e0b',
       description: 'Students who completed document verification',
       type: 'completed',
@@ -75,7 +94,12 @@ const LiveStageCounts = ({ analyticsData, autoRefresh, lastUpdated }) => {
     {
       key: 'kit',
       label: 'Kit Received',
-      icon: '📦',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73L12 2 4 6.27A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73L12 22l8-4.27A2 2 0 0 0 21 16z"/>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+        </svg>
+      ),
       color: '#10b981',
       description: 'Students who received their kit',
       type: 'completed',
@@ -87,7 +111,13 @@ const LiveStageCounts = ({ analyticsData, autoRefresh, lastUpdated }) => {
     <div className="live-stage-counts">
       <div className="live-stage-counts-header">
         <div className="header-content">
-          <div className="header-icon">📊</div>
+          <div className="header-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+          </div>
           <div className="header-text">
             <h3>Live Stage Counts</h3>
             <p>Real-time student progression through onboarding stages</p>
@@ -160,7 +190,11 @@ const LiveStageCounts = ({ analyticsData, autoRefresh, lastUpdated }) => {
               
               <div className="card-footer">
                 <div className="stage-type-indicator">
-                  {stage.type === 'completed' ? '✅ Completed' : '⏳ Pending'}
+                  {stage.type === 'completed' ? (
+                    <span className="type-complete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg> Completed</span>
+                  ) : (
+                    <span className="type-pending"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2v6l4 2-4 2v6h12v-6l-4-2 4-2V2"/></svg> Pending</span>
+                  )}
                 </div>
               </div>
             </div>

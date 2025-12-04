@@ -333,21 +333,35 @@ const Analytics = () => {
         <SummaryCard
           title="Total Students"
           value={stats.uniqueStudents}
-          icon="👥"
+          icon={(
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="3" />
+            </svg>
+          )}
           color="#10b981"
           delay={100}
         />
         <SummaryCard
           title="Completed Journey"
           value={stats.completedStudents}
-          icon="✅"
+          icon={(
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          )}
           color="#059669"
           delay={200}
         />
         <SummaryCard
           title="Active Volunteers"
           value={stats.uniqueVolunteers}
-          icon="🤝"
+          icon={(
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z" />
+              <path d="M2 20v-1c0-2.8 5.6-4 10-4s10 1.2 10 4v1" />
+            </svg>
+          )}
           color="#f59e0b"
           delay={300}
         />
@@ -373,30 +387,29 @@ const Analytics = () => {
         </div>
       ) : (
         <>
-          {/* Filters */}
-          <div className="filters-card">
-      <AdvancedFilter
-              searchTerm={filters.searchTerm}
-              onSearchChange={(value) => setFilters(prev => ({ ...prev, searchTerm: value }))}
-              selectedStage={filters.stage || 'all'}
-              onStageChange={(value) => setFilters(prev => ({ ...prev, stage: value }))}
-              selectedVolunteer={filters.volunteer || 'all'}
-              onVolunteerChange={(value) => setFilters(prev => ({ ...prev, volunteer: value }))}
-              stages={['all', ...filterOptions.stages]}
-              volunteers={['all', ...filterOptions.volunteers]}
-            />
-          </div>
-
           {/* Key Insights Section */}
           {analyticsData.summary && (
             <div className="insights-section">
               <div className="insights-header">
-                <h3>📊 Key Insights</h3>
+                <h3>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 8 }}>
+                    <line x1="18" y1="20" x2="18" y2="10" />
+                    <line x1="12" y1="20" x2="12" y2="4" />
+                    <line x1="6" y1="20" x2="6" y2="14" />
+                  </svg>
+                  Key Insights
+                </h3>
                 <p>Real-time analytics from your onboarding system</p>
               </div>
               <div className="insights-grid">
                 <div className="insight-card">
-                  <div className="insight-icon">🎯</div>
+                  <div className="insight-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <circle cx="12" cy="12" r="6" />
+                      <circle cx="12" cy="12" r="2" />
+                    </svg>
+                  </div>
                   <div className="insight-content">
                     <h4>Completion Rate</h4>
                     <p className="insight-value">{((stats.completedStudents / stats.uniqueStudents) * 100).toFixed(1)}%</p>
@@ -404,7 +417,11 @@ const Analytics = () => {
                   </div>
                 </div>
                 <div className="insight-card">
-                  <div className="insight-icon">⚡</div>
+                  <div className="insight-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
+                  </div>
                   <div className="insight-content">
                     <h4>Biggest Bottleneck</h4>
                     <p className="insight-value">{analyticsData.summary.insights?.biggestDropoff?.stage || 'N/A'}</p>
@@ -412,7 +429,12 @@ const Analytics = () => {
                   </div>
                 </div>
                 <div className="insight-card">
-                  <div className="insight-icon">⏰</div>
+                  <div className="insight-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 2" />
+                    </svg>
+                  </div>
                   <div className="insight-content">
                     <h4>Peak Activity</h4>
                     <p className="insight-value">
@@ -441,7 +463,12 @@ const Analytics = () => {
                   </div>
                 </div>
                 <div className="insight-card">
-                  <div className="insight-icon">🚀</div>
+                  <div className="insight-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M22 2s-4 1-6 3-3 6-3 6 3 0 6-3 3-6 3-6z" />
+                      <path d="M6 20l4-4" />
+                    </svg>
+                  </div>
                   <div className="insight-content">
                     <h4>Avg Journey Time</h4>
                     <p className="insight-value">{analyticsData.stageTiming?.stageTimings?.overallJourney?.average || 'N/A'}</p>
@@ -452,45 +479,97 @@ const Analytics = () => {
             </div>
           )}
 
-          {/* Charts Section */}
-          <div className="chart-display-card">
-            <div className="chart-header">
-              <h3>Analytics Overview</h3>
-              <p>Visual insights into scan patterns and volunteer performance</p>
-        </div>
+          {/* Analytics Overview Section */}
+          <div className="analytics-overview-section">
+            <div className="overview-header">
+              <div className="overview-title">
+                <h3>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 8 }}>
+                    <line x1="18" y1="20" x2="18" y2="10" />
+                    <line x1="12" y1="20" x2="12" y2="4" />
+                    <line x1="6" y1="20" x2="6" y2="14" />
+                  </svg>
+                  Analytics Overview
+                </h3>
+                <p>Visual insights into scan patterns and volunteer performance</p>
+              </div>
+              
+              {/* Compact Filters */}
+              <div className="overview-filters">
+                <AdvancedFilter
+                  searchTerm={filters.searchTerm}
+                  onSearchChange={(value) => setFilters(prev => ({ ...prev, searchTerm: value }))}
+                  selectedStage={filters.stage || 'all'}
+                  onStageChange={(value) => setFilters(prev => ({ ...prev, stage: value }))}
+                  selectedVolunteer={filters.volunteer || 'all'}
+                  onVolunteerChange={(value) => setFilters(prev => ({ ...prev, volunteer: value }))}
+                  stages={['all', ...filterOptions.stages]}
+                  volunteers={['all', ...filterOptions.volunteers]}
+                />
+              </div>
+            </div>
             
             <div className="charts-grid">
-              <ChartCard title="Scans by Stage" icon="📋">
+              <ChartCard 
+                title="Scans by Stage" 
+                icon={(
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                  </svg>
+                )}
+                color="#2563eb"
+                subtitle="Distribution across onboarding stages"
+              >
                 <div ref={scansByStageRef}>
                   <ScansByStageChart data={filteredLogs} />
                 </div>
               </ChartCard>
               
-              <ChartCard title="Top Volunteers" icon="👤">
+              <ChartCard 
+                title="Top Volunteers" 
+                icon={(
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M4 21v-2a4 4 0 0 1 3-3.87" />
+                    <path d="M15.5 7.5a3 3 0 1 1-7 0 3 3 0 0 1 7 0z" />
+                  </svg>
+                )}
+                color="#10b981"
+                subtitle="Most active volunteer contributors"
+              >
                 <div ref={scansByVolunteerRef}>
                   <ScansByVolunteerChart data={filteredLogs} />
                 </div>
               </ChartCard>
               
-              <ChartCard title="Activity Timeline" icon="📈">
+              <ChartCard 
+                title="Activity Timeline" 
+                icon={(
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                  </svg>
+                )}
+                color="#f59e0b"
+                subtitle="Scan activity over time periods"
+              >
                 <div ref={scansOverTimeRef}>
                   <ScansOverTimeChart data={filteredLogs} />
                 </div>
               </ChartCard>
         
-        <ChartCard
+              <ChartCard
                 title="Peak Hours Analysis" 
                 icon="⏰"
+                color="#8b5cf6"
                 subtitle="Hourly scan distribution across all stages"
-                expandable={false}
-                defaultExpanded={true}
               >
                 <div ref={hourlyDistributionRef}>
                   <HourlyDistributionChart data={filteredLogs} timeFrame={timeFrame} />
                 </div>
               </ChartCard>
             </div>
-      </div>
+          </div>
 
       {/* Data Table */}
           <div className="data-table-container">

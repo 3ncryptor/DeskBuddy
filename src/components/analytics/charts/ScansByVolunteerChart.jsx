@@ -80,67 +80,102 @@ const ScansByVolunteerChart = ({ data }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 2000,
+      easing: 'easeInOutCubic',
+      delay: (context) => context.dataIndex * 150
+    },
+    interaction: {
+      intersect: false,
+      mode: 'index'
+    },
     plugins: {
       legend: {
         display: false
       },
       tooltip: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backgroundColor: 'rgba(255, 255, 255, 0.98)',
         titleColor: '#1e293b',
-        bodyColor: '#1e293b',
-        borderColor: 'rgba(0, 0, 0, 0.1)',
-        borderWidth: 1,
-        cornerRadius: 8,
+        bodyColor: '#475569',
+        borderColor: 'rgba(16, 185, 129, 0.3)',
+        borderWidth: 2,
+        cornerRadius: 12,
         displayColors: true,
-        callbacks: {
-          label: function(context) {
-            return `${context.label}: ${context.parsed.y} scans`;
-          }
+        padding: 16,
+        titleFont: {
+          size: 14,
+          weight: '600',
+          family: 'Inter, system-ui, sans-serif'
         },
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-        backdropFilter: 'blur(8px)'
+        bodyFont: {
+          size: 12,
+          weight: '500',
+          family: 'Inter, system-ui, sans-serif'
+        },
+        callbacks: {
+          title: function(context) {
+            return `${context[0].label}`;
+          },
+          label: function(context) {
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const percentage = ((context.parsed.y / total) * 100).toFixed(1);
+            return [
+              `Scans: ${context.parsed.y}`,
+              `Contribution: ${percentage}%`
+            ];
+          }
+        }
       }
     },
     scales: {
       x: {
         grid: {
-          color: 'rgba(0, 0, 0, 0.08)',
-          drawBorder: false,
-          lineWidth: 1
+          display: false
+        },
+        border: {
+          display: false
         },
         ticks: {
           color: '#64748b',
-          font: { size: 11 }
+          font: { 
+            size: 10,
+            family: 'Inter, system-ui, sans-serif',
+            weight: '500'
+          },
+          maxRotation: 45,
+          padding: 8
         }
       },
       y: {
         beginAtZero: true,
         grid: {
-          color: 'rgba(0, 0, 0, 0.08)',
-          drawBorder: false,
-          lineWidth: 1
+          color: 'rgba(148, 163, 184, 0.1)',
+          drawBorder: false
+        },
+        border: {
+          display: false
         },
         ticks: {
           color: '#64748b',
-          font: { size: 11 },
-          stepSize: 1
+          font: { 
+            size: 11,
+            family: 'Inter, system-ui, sans-serif',
+            weight: '500'
+          },
+          stepSize: 1,
+          padding: 12
         }
       }
     },
-    elements: {
-      bar: {
-        shadowColor: 'rgba(0, 0, 0, 0.3)',
-        shadowBlur: 8,
-        shadowOffsetX: 2,
-        shadowOffsetY: 2
-      }
+    onHover: (event, activeElements) => {
+      event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
     },
     layout: {
       padding: {
-        top: 20,
-        right: 20,
-        bottom: 20,
-        left: 20
+        top: 10,
+        right: 15,
+        bottom: 10,
+        left: 15
       }
     }
   };
@@ -184,20 +219,15 @@ const ScansByVolunteerChart = ({ data }) => {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        // 3D container effects
-        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+        background: 'rgba(255, 255, 255, 0.4)',
         borderRadius: '16px',
-        boxShadow: `
-          0 8px 32px rgba(0, 0, 0, 0.1),
-          0 4px 16px rgba(0, 0, 0, 0.05),
-          inset 0 1px 0 rgba(255, 255, 255, 0.2)
-        `,
-        border: '1px solid rgba(255, 255, 255, 0.2)',
+        border: '1px solid rgba(255, 255, 255, 0.6)',
         backdropFilter: 'blur(8px)',
         position: 'relative',
-        padding: '1rem'
+        padding: '1.5rem',
+        transition: 'all 0.3s ease'
       }}>
-        {/* 3D inner glow effect */}
+        {/* Enhanced glow effect */}
         <div style={{
           position: 'absolute',
           top: '0',
@@ -205,8 +235,9 @@ const ScansByVolunteerChart = ({ data }) => {
           right: '0',
           bottom: '0',
           borderRadius: '16px',
-          background: 'radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 50%)',
-          pointerEvents: 'none'
+          background: 'radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 60%)',
+          pointerEvents: 'none',
+          opacity: 0.8
         }} />
         <Bar data={chartData} options={options} />
       </div>
