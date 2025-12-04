@@ -1,6 +1,7 @@
 import React from "react";
-import "../styles/StudentInfoCard.css";
-import avatar from "../assets/avitar.webp"; // fallback to .svg if .png not found
+import { motion } from "framer-motion";
+import "../styles/ModernStudentInfoCard.css";
+import avatar from "../assets/avitar.webp"; // Keep the avatar
 
 const stageLabels = {
   arrival: {
@@ -9,10 +10,13 @@ const stageLabels = {
     verifiedByKey: "arrivalVerifiedBy",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
+        <path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+        <path d="M10 11v6"/>
+        <path d="M14 11v6"/>
       </svg>
     ),
+    color: "#3b82f6",
+    gradient: "linear-gradient(135deg, #3b82f6, #60a5fa)"
   },
   hostel: {
     label: "Hostel",
@@ -20,10 +24,12 @@ const stageLabels = {
     verifiedByKey: "hostelVerifiedBy",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
         <polyline points="9 22 9 12 15 12 15 22" />
       </svg>
     ),
+    color: "#8b5cf6",
+    gradient: "linear-gradient(135deg, #8b5cf6, #a78bfa)"
   },
   documents: {
     label: "Documents",
@@ -31,10 +37,14 @@ const stageLabels = {
     verifiedByKey: "documentsVerifiedBy",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <path d="M16 13H8"/>
+        <path d="M16 17H8"/>
       </svg>
     ),
+    color: "#f59e0b",
+    gradient: "linear-gradient(135deg, #f59e0b, #fbbf24)"
   },
   kit: {
     label: "Kit",
@@ -42,10 +52,13 @@ const stageLabels = {
     verifiedByKey: "kitReceivedBy",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M21 16V8a2 2 0 0 0-1-1.73L12 2 4 6.27A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73L12 22l8-4.27A2 2 0 0 0 21 16z" />
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+        <path d="M21 16V8a2 2 0 0 0-1-1.73L12 2 4 6.27A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73L12 22l8-4.27A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+        <polyline points="7.5 4.21 12 6.81 16.5 4.21"/>
       </svg>
     ),
+    color: "#10b981",
+    gradient: "linear-gradient(135deg, #10b981, #34d399)"
   },
 };
 
@@ -100,207 +113,314 @@ const StudentInfoCard = ({ student, currentStage }) => {
 
   if (!student) {
     return (
-      <div
-        className={`student-card professional-card fade-in wide big ${getCardColorClass()}`}
-      >
-        <div className="student-card-header big">
-          <div className="avatar-container">
-            <img
-              src={avatar}
-              alt="Student Avatar"
-              className="student-avatar big"
-            />
-            <div className="avatar-status neutral">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M6 2h12M6 22h12M6 2v6a6 6 0 0 0 6 6v6M18 2v6a6 6 0 0 1-6 6"/>
+      <div className="modern-student-card empty-state beige-theme">
+        <div className="modern-student-card-content">
+          <div className="empty-state-header">
+          <div className="empty-avatar">
+            <img src={avatar} alt="Student Avatar" className="empty-avatar-img" />
+            <div className="empty-avatar-overlay">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
               </svg>
             </div>
           </div>
-          <div className="student-header-info">
-            <span className="student-name big">No Student Data</span>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: "0%" }}></div>
-            </div>
+          <div className="empty-header-content">
+            <h3>No Student Selected</h3>
+            <p>Scan a QR code to view student information</p>
           </div>
         </div>
-        <div className="student-fields empty">
-          <div className="student-row">
-            <span className="student-label">Status:</span>
-            <span className="student-value">Please scan a QR code</span>
-          </div>
+        
+        <div className="empty-scan-indicator">
+          <div className="scan-pulse"></div>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="3" y="4" width="18" height="14" rx="2" ry="2"/>
+            <polyline points="7 8 12 13 17 8"/>
+          </svg>
+          <span>Ready to Scan</span>
+        </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      className={`student-card professional-card fade-in wide big ${getCardColorClass()}`}
+    <motion.div 
+      className={`modern-student-card ${getCardColorClass()}`}
+      style={{
+        '--group-gradient': student.group?.toLowerCase().includes('red') 
+          ? 'linear-gradient(135deg, #ef4444, #f87171)'
+          : student.group?.toLowerCase().includes('blue')
+          ? 'linear-gradient(135deg, #3b82f6, #60a5fa)'
+          : 'linear-gradient(135deg, #8b5cf6, #a78bfa)'
+      }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <div className="student-card-header big">
-        <div className="avatar-container">
-          <img
-            src={avatar}
-            alt="Student Avatar"
-            className="student-avatar big"
+      <div className="modern-student-card-content">
+      {/* Header with Avatar and Student Info */}
+      <motion.div 
+        className="student-card-header"
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.7, delay: 0.1 }}
+      >
+        <div className="student-info-section">
+          <motion.img 
+            src={avatar} 
+            alt="Student Avatar" 
+            className="student-avatar"
+            initial={{ scale: 0.8, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            whileHover={{ scale: 1.05 }}
           />
-          <div
-            className={`avatar-status ${
-              completionPercentage === 100
-                ? "completed"
-                : completionPercentage >= 50
-                ? "in-progress"
-                : "pending"
-            }`}
-          >
-            {completionPercentage === 100 ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            ) : completionPercentage >= 50 ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="23 4 23 10 17 10" />
-                <polyline points="1 20 1 14 7 14" />
-                <path d="M3 7a9 9 0 0 0 18 0" />
-              </svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M6 2h12M6 22h12M6 2v6a6 6 0 0 0 6 6v6M18 2v6a6 6 0 0 1-6 6"/>
-              </svg>
-            )}
-          </div>
-        </div>
-        <div className="student-header-info">
-          <span className="student-name big">{student.name}</span>
-          <div className="progress-section">
-            <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{ width: `${completionPercentage}%` }}
-              ></div>
-            </div>
-            <div className="progress-text">
-              {completedStages}/{totalStages} stages completed
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="quick-stats">
-        <div className="stat-item">
-          <span className="stat-label">Student ID:</span>
-          <span className="stat-value">{student.studentId}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Group:</span>
-          <span className="stat-value">{student.group || "Not assigned"}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Room:</span>
-          <span className="stat-value">
-            {student.roomNumber || "Not assigned"}
-          </span>
-        </div>
-      </div>
-
-      <div className="student-main-fields">
-        <div className="student-row">
-          <span className="student-label">Due Amount:</span>
-          <span className="student-value">
-            {typeof student.dueAmount === "number"
-              ? `₹${student.dueAmount.toLocaleString()}`
-              : "Not available"}
-          </span>
-        </div>
-        <div className="student-row">
-          <span className="student-label">Email:</span>
-          <span className="student-value">
-            {student.email || "Not available"}
-          </span>
-        </div>
-        <div className="student-row">
-          <span className="student-label">Program:</span>
-          <span className="student-value">
-            {student.program || "Not available"}
-          </span>
-        </div>
-      </div>
-
-      {status && (
-        <div className="scan-status-section single">
-          <div className="scan-status-title">
-            {status.icon} {status.label} Status
-          </div>
-          <div className="scan-status-row single">
-            <span className="scan-status-label">{status.label}:</span>
-            <span
-              className={`scan-status-chip animated-chip ${
-                status.completed ? "yes" : "no"
-              }`}
+          <div className="student-info">
+            <motion.div 
+              className="student-name-box"
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
             >
+              <h2 className="student-name">{student.name}</h2>
+            </motion.div>
+            <motion.div 
+              className="student-id-box"
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <p className="student-id">{student.studentId}</p>
+            </motion.div>
+            <div className="completion-metrics">
+              <span className="stages-count">{completedStages} of {totalStages} stages completed</span>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Full Width Progress Bar */}
+      <motion.div 
+        className="full-width-progress-container"
+        initial={{ opacity: 0, scaleX: 0 }}
+        whileInView={{ opacity: 1, scaleX: 1 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
+        <div className="progress-labels">
+          <span>Progress</span>
+          <span>{completedStages}/{totalStages}</span>
+        </div>
+        <div className="full-width-progress-bar">
+          <motion.div 
+            className="progress-fill"
+            initial={{ width: "0%" }}
+            whileInView={{ width: `${completionPercentage}%` }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
+            style={{ 
+              background: completionPercentage === 100 
+                ? 'linear-gradient(135deg, #10b981, #34d399)' 
+                : completionPercentage >= 50 
+                ? 'linear-gradient(135deg, #3b82f6, #60a5fa)' 
+                : 'linear-gradient(135deg, #f59e0b, #fbbf24)'
+            }}
+          >
+            <div className="progress-shine"></div>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Student Details Grid */}
+      <motion.div 
+        className="student-details-grid"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      >
+        <motion.div 
+          className="detail-card amount"
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        >
+          <motion.div 
+            className="detail-icon" 
+            style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}
+            whileHover={{ rotate: 10, scale: 1.1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </motion.div>
+          <div className="detail-content">
+            <span className="detail-label">Due Amount</span>
+            <span className="detail-value">
+              {typeof student.dueAmount === 'number' 
+                ? `₹${student.dueAmount.toLocaleString()}` 
+                : 'Not available'
+              }
+            </span>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Current Stage Spotlight */}
+      {status && (
+        <motion.div 
+          className="current-stage-spotlight"
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7, delay: 0.4 }} 
+             style={{
+               '--stage-color': stageLabels[currentStage]?.color,
+               '--stage-gradient': stageLabels[currentStage]?.gradient
+             }}>
+          <div className="spotlight-header">
+            <div className="spotlight-icon" style={{ background: stageLabels[currentStage]?.gradient }}>
+              {status.icon}
+            </div>
+            <div className="spotlight-content">
+              <h4>{status.label} Stage</h4>
+              <p>Current verification status</p>
+            </div>
+            <div className={`spotlight-status ${status.completed ? 'completed' : 'pending'}`}>
               {status.completed ? (
                 <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                   Completed
                 </>
               ) : (
                 <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
-                    <path d="M6 2h12M6 22h12M6 2v6a6 6 0 0 0 6 6v6M18 2v6a6 6 0 0 1-6 6"/>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
                   </svg>
-                  Pending
+                  In Progress
                 </>
               )}
-            </span>
-            <span className="scan-status-by">
-              {status.completed
-                ? `by ${status.verifiedBy || "Unknown"}`
-                : "Not assigned"}
-            </span>
+            </div>
           </div>
-        </div>
+          {status.completed && status.verifiedBy && (
+            <div className="spotlight-footer">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              Verified by {status.verifiedBy}
+            </div>
+          )}
+        </motion.div>
       )}
 
-      <div className="all-stages-overview">
-        <div className="stages-title">All Stages Overview</div>
+      {/* Stages Progress Cards */}
+      <motion.div 
+        className="stages-progress-section"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+      >
+        <div className="stages-header">
+          <h4>Verification Stages</h4>
+          <div className="stages-summary">
+            <span className="completed-count">{completedStages}</span>
+            <span className="total-stages">/ {totalStages} completed</span>
+          </div>
+        </div>
+        
         <div className="stages-grid">
-          {Object.entries(stageLabels).map(([key, stageInfo]) => {
+          {Object.entries(stageLabels).map(([key, stageInfo], index) => {
             const isCompleted = student[stageInfo.statusKey];
             const isCurrent = key === currentStage;
+            const verifiedBy = student[stageInfo.verifiedByKey];
+            
             return (
-              <div
+              <motion.div
                 key={key}
-                className={`stage-item ${
-                  isCompleted ? "completed" : isCurrent ? "current" : "pending"
+                className={`stage-progress-card ${
+                  isCompleted ? 'completed' : isCurrent ? 'current' : 'pending'
                 }`}
+                style={{
+                  '--stage-color': stageInfo.color,
+                  '--stage-gradient': stageInfo.gradient
+                }}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.6, delay: 0.6 + (index * 0.1) }}
+                whileHover={{ scale: 1.02, y: -2 }}
               >
-                <span className="stage-icon">{stageInfo.icon}</span>
-                <span className="stage-name">{stageInfo.label}</span>
-                <span className="stage-status">
-                  {isCompleted ? (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  ) : isCurrent ? (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polyline points="23 4 23 10 17 10" />
-                      <polyline points="1 20 1 14 7 14" />
-                      <path d="M3 7a9 9 0 0 0 18 0" />
-                    </svg>
-                  ) : (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M6 2h12M6 22h12M6 2v6a6 6 0 0 0 6 6v6M18 2v6a6 6 0 0 1-6 6"/>
-                    </svg>
+                <div className="card-header">
+                  <div className="stage-icon" 
+                       style={{ 
+                         background: isCompleted || isCurrent ? stageInfo.gradient : undefined 
+                       }}>
+                    {stageInfo.icon}
+                  </div>
+                  <div className="stage-status">
+                    <div className="stage-label">{stageInfo.label}</div>
+                    <div className="stage-description">
+                      {isCompleted ? 'Verification completed' : isCurrent ? 'Currently verifying' : 'Pending verification'}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="card-footer">
+                  <div className="stage-type-indicator">
+                    {isCompleted ? (
+                      <span className="type-complete">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg> 
+                        Completed
+                      </span>
+                    ) : isCurrent ? (
+                      <span className="type-current">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"/>
+                          <path d="M12 6v6l4 2"/>
+                        </svg> 
+                        In Progress
+                      </span>
+                    ) : (
+                      <span className="type-pending">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"/>
+                        </svg> 
+                        Pending
+                      </span>
+                    )}
+                  </div>
+                  {isCompleted && verifiedBy && (
+                    <div className="verified-by">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                      </svg>
+                      {verifiedBy}
+                    </div>
                   )}
-                </span>
-              </div>
+                </div>
+              </motion.div>
             );
           })}
         </div>
+      </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

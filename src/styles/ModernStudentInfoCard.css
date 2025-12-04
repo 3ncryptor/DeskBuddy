@@ -1,0 +1,986 @@
+/* Modern Student Info Card - LiveStageCounts Design Pattern */
+
+.modern-student-card {
+  background: linear-gradient(135deg, #f5f5dc 0%, #f0f0e8 50%, #ede8d3 100%);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 18px;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  min-width: 440px;
+  max-width: 560px;
+  width: 560px;
+  box-shadow: 0 8px 40px 0 rgba(139, 123, 105, 0.15);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+  animation: slideInUp 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.modern-student-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: var(--group-gradient, linear-gradient(135deg, #8b5cf6, #a78bfa));
+  border-radius: inherit;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+}
+
+.modern-student-card-content {
+  padding: 2.2rem 2.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+
+
+.modern-student-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 60px 0 rgba(139, 123, 105, 0.25);
+}
+
+/* Empty State */
+.modern-student-card.empty-state {
+  text-align: center;
+  background: linear-gradient(135deg, #f8f8f0 0%, #f0f0e8 50%, #e8e8dc 100%);
+  border-style: dashed;
+}
+
+.modern-student-card.empty-state::before {
+  background: linear-gradient(135deg, #d4c5b9, #c4b59c);
+}
+
+.modern-student-card.empty-state .modern-student-card-content {
+  padding: 2.2rem 2.5rem;
+}
+
+.empty-state-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.empty-avatar {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.empty-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0.3;
+}
+
+.empty-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+}
+
+.empty-header-content h3 {
+  color: #475569;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-header-content p {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.empty-scan-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  color: #64748b;
+}
+
+.scan-pulse {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 2px solid #3b82f6;
+  border-radius: 50%;
+  opacity: 0;
+  animation: scan-pulse 2s infinite;
+}
+
+@keyframes scan-pulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* Header with Student Info */
+.student-card-header {
+  margin-bottom: 2.5rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid rgba(139, 123, 105, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(139, 123, 105, 0.1);
+}
+
+.student-info-section {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.student-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 32px;
+  object-fit: cover;
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 40px rgba(139, 123, 105, 0.25);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #f8f8f0, #f0f0e8);
+  flex-shrink: 0;
+}
+
+.student-avatar:hover {
+  border-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 18px 50px rgba(139, 123, 105, 0.35);
+  transform: scale(1.02) translateY(-3px);
+}
+
+.student-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-name-box {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 248, 240, 0.8));
+  border: 1.5px solid rgba(139, 123, 105, 0.3);
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(139, 123, 105, 0.1);
+  transition: all 0.3s ease;
+}
+
+.student-name-box:hover {
+  border-color: rgba(139, 123, 105, 0.4);
+  box-shadow: 0 6px 20px rgba(139, 123, 105, 0.15);
+  transform: translateY(-1px);
+}
+
+.student-name {
+  color: #1a1a1a;
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+.student-id-box {
+  background: linear-gradient(135deg, rgba(107, 91, 61, 0.1), rgba(139, 115, 85, 0.1));
+  border: 1.5px solid rgba(107, 91, 61, 0.2);
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.25rem;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 3px 12px rgba(107, 91, 61, 0.08);
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.student-id-box:hover {
+  border-color: rgba(107, 91, 61, 0.3);
+  box-shadow: 0 5px 16px rgba(107, 91, 61, 0.12);
+  transform: translateY(-1px);
+}
+
+.student-id {
+  color: #6b5b3d;
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+}
+
+.completion-metrics {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.percentage-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--stage-gradient);
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 800;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.percentage-badge::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: rotate(45deg);
+  transition: all 0.6s ease;
+  opacity: 0;
+}
+
+.percentage-badge:hover::before {
+  opacity: 1;
+  animation: shimmer 1.5s ease-in-out;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.stages-count {
+  color: #8b7355;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+}
+
+/* Full Width Progress Container */
+.full-width-progress-container {
+  margin: 1.5rem 0 2rem 0;
+  padding: 0;
+  width: 100%;
+}
+
+.full-width-progress-bar {
+  width: 100%;
+  height: 12px;
+  background: rgba(139, 123, 105, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 0.75rem;
+  box-shadow: inset 0 2px 4px rgba(139, 123, 105, 0.1);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(139, 123, 105, 0.2);
+}
+
+.full-width-progress-bar .progress-fill {
+  height: 100%;
+  border-radius: 8px;
+  transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+.full-width-progress-bar .progress-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #6b5b3d;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+/* Student Details Grid */
+.student-details-grid {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.student-details-grid .detail-card {
+  width: 100%;
+  max-width: 100%;
+}
+
+.detail-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(139, 123, 105, 0.2);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.detail-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.detail-card:hover::before {
+  left: 100%;
+}
+
+.detail-card:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(139, 123, 105, 0.4);
+  box-shadow: 0 8px 25px rgba(139, 123, 105, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 38, 135, 0.08);
+}
+
+.detail-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.detail-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  filter: brightness(1.2);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.detail-card:hover .detail-icon::before {
+  opacity: 1;
+}
+
+.detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.detail-label {
+  color: #8b7355;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.detail-value {
+  color: #4a3c28;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+/* Current Stage Spotlight */
+.current-stage-spotlight {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.4);
+  border: 2px solid var(--stage-color);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.current-stage-spotlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--stage-gradient);
+}
+
+.spotlight-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.spotlight-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.current-stage-spotlight:hover .spotlight-icon {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.spotlight-content {
+  flex: 1;
+}
+
+.spotlight-content h4 {
+  color: #1e293b;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+}
+
+.spotlight-content p {
+  color: #64748b;
+  font-size: 0.8rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+.spotlight-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.spotlight-status.completed {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.spotlight-status.pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.spotlight-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Stages Progress Section */
+.stages-progress-section {
+  margin-bottom: 1rem;
+}
+
+.stages-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e3e8f7;
+}
+
+.stages-header h4 {
+  color: #1e293b;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(90deg, #2563eb, #5bc0eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stages-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.completed-count {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #2563eb;
+  line-height: 1;
+}
+
+.total-stages {
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.stages-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.stage-progress-card {
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  animation: slideInUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stage-progress-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.stage-progress-card.completed {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: var(--stage-color);
+}
+
+.stage-progress-card.completed::before {
+  background: var(--stage-gradient);
+}
+
+.stage-progress-card.current {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: var(--stage-color);
+  box-shadow: 0 0 0 1px var(--stage-color);
+}
+
+.stage-progress-card.current::before {
+  background: var(--stage-gradient);
+  animation: current-pulse 2s infinite;
+}
+
+@keyframes current-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.stage-progress-card.pending {
+  background: rgba(248, 250, 252, 0.8);
+  border-color: #cbd5e1;
+}
+
+.stage-progress-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.08);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stage-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  color: #64748b;
+  transition: all 0.3s ease;
+}
+
+.stage-progress-card:hover .stage-icon {
+  transform: scale(1.1);
+}
+
+.stage-progress-card.completed .stage-icon,
+.stage-progress-card.current .stage-icon {
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stage-status {
+  flex: 1;
+}
+
+.stage-label {
+  color: #1e293b;
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stage-description {
+  color: #64748b;
+  font-size: 0.75rem;
+  margin: 0;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.stage-type-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.type-complete {
+  color: #059669;
+}
+
+.type-current {
+  color: #2563eb;
+}
+
+.type-pending {
+  color: #64748b;
+}
+
+.verified-by {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Group Color Variants */
+.modern-student-card.group-red {
+  border-color: #f87171;
+}
+
+.modern-student-card.group-red::before {
+  background: linear-gradient(90deg, #ef4444, #f87171, #fca5a5);
+}
+
+.modern-student-card.group-blue {
+  border-color: #60a5fa;
+}
+
+.modern-student-card.group-blue::before {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa, #93c5fd);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modern-student-card {
+    width: 99vw;
+    max-width: 99vw;
+    min-width: 320px;
+    margin-bottom: 1rem;
+  }
+  
+  .modern-student-card-content {
+    padding: 1.5rem;
+  }
+  
+  .student-card-header {
+    padding: 1.5rem;
+  }
+  
+  .student-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 28px;
+  }
+  
+  .student-info-section {
+    gap: 1.5rem;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .student-name {
+    font-size: 1.75rem;
+    color: #1a1a1a;
+  }
+  
+  .student-id {
+    font-size: 1rem;
+  }
+  
+  .student-name-box, .student-id-box {
+    text-align: center;
+  }
+  
+  .student-name {
+    font-size: 1.5rem;
+  }
+  
+  .student-id {
+    font-size: 1rem;
+  }
+  
+  .full-width-progress-bar {
+    height: 10px;
+  }
+  
+  .student-details-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .stages-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .spotlight-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .stages-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .modern-student-card {
+    width: 95vw;
+    max-width: 95vw;
+    min-width: 320px;
+    border-radius: 12px;
+  }
+  
+  .modern-student-card-content {
+    padding: 1rem;
+  }
+  
+  .student-card-header {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+  
+  .student-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 24px;
+  }
+  
+  .student-info-section {
+    gap: 1rem;
+  }
+  
+  .student-name {
+    font-size: 1.5rem;
+    color: #1a1a1a;
+  }
+  
+  .student-id {
+    font-size: 0.9rem;
+  }
+  
+  .student-name-box {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .student-id-box {
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .student-name {
+    font-size: 1.25rem;
+  }
+  
+  .student-id {
+    font-size: 0.875rem;
+  }
+  
+  .full-width-progress-bar {
+    height: 8px;
+  }
+  
+  .detail-card {
+    padding: 0.75rem;
+  }
+  
+  .current-stage-spotlight {
+    padding: 1rem;
+  }
+  
+  .spotlight-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .stage-progress-card {
+    padding: 1rem;
+  }
+}
+
+/* Animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Desktop width matching original design */
+@media (min-width: 1024px) {
+  .modern-student-card {
+    width: 560px;
+    max-width: 560px;
+    min-width: 440px;
+    margin: 0 auto;
+  }
+  
+  .modern-student-card-content {
+    padding: 2.2rem 2.5rem;
+  }
+  
+  .student-card-header {
+    padding: 2.5rem;
+  }
+  
+  .student-avatar {
+    width: 170px;
+    height: 170px;
+    border-radius: 36px;
+  }
+  
+  .student-info-section {
+    gap: 3rem;
+  }
+  
+  .student-name {
+    font-size: 2.5rem;
+    color: #1a1a1a;
+  }
+  
+  .student-id {
+    font-size: 1.25rem;
+  }
+  
+  .student-name-box {
+    padding: 1.25rem 2rem;
+  }
+  
+  .student-id-box {
+    padding: 1rem 1.5rem;
+  }
+  
+  .student-name {
+    font-size: 2.25rem;
+    color: #1a1a1a;
+  }
+  
+  .student-id {
+    font-size: 1.375rem;
+  }
+  
+  .full-width-progress-bar {
+    height: 14px;
+  }
+  
+  .student-details-grid {
+    gap: 1.5rem;
+  }
+  
+  .stages-grid {
+    gap: 1.5rem;
+  }
+}
